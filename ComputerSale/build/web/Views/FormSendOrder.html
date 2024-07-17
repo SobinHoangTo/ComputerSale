@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Invoice</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                max-width: 800px;
+                margin: auto;
+                background-color: #f8f8f8;
+            }
+            .container {
+                padding: 20px;
+                background-color: white;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                margin-top: 20px;
+                border-radius: 10px;
+            }
+            .header {
+                text-align: left;
+                border-bottom: 2px solid crimson;
+                padding-bottom: 10px;
+                margin-bottom: 20px;
+            }
+            .store-info {
+                color: crimson;
+            }
+            .store-info .store-title {
+                margin-bottom: 5px;
+            }
+            .store-info .contact-info {
+                margin-bottom: 5px;
+            }
+            .store-info .contact-info div {
+                margin-bottom: 2px;
+            }
+            .order-number {
+                font-weight: bold;
+                font-size: 50px;
+                color: crimson;
+                text-align: center;
+            }
+            .customer-info, .order-info {
+                margin-bottom: 20px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            table, th, td {
+                border: 1px solid crimson;
+            }
+            th {
+                background-color: crimson;
+                color: white;
+                padding: 10px;
+                text-align: center;
+            }
+            td {
+                padding: 8px;
+                text-align: left;
+            }
+            .total {
+                font-weight: bold;
+                text-align: right;
+                font-size: 18px;
+                margin-top: 20px;
+            }
+            .actions {
+                text-align: right;
+                color: crimson;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <div class="store-info">
+                    <div class="store-title"><strong>Linh và đồng bọn Store</strong></div>
+                    <div class="contact-info">
+                        <div>Địa chỉ: Đại học Fpt HL</div>
+                        <div>Điện thoại: 123456789</div>
+                    </div>
+                </div>
+            </div>
+            <div class="actions">
+                Print | PDF | Email
+            </div>
+            <div class="order-number">
+                Orders
+            </div>
+            <div class="actions" style="text-align: center;">
+               Ngày: {date}
+            </div>
+            <div class="customer-info">
+                <strong>THÔNG TIN KHÁCH HÀNG</strong><hr>
+                <p>Tên khách hàng: {name}
+                <br/>Điện thoại: {phone}
+                </p>
+            </div>
+            <div class="order-info">
+                <strong>THÔNG TIN ĐƠN HÀNG</strong><hr>
+                <p>Mã vận đơn: {orderID}</p>
+                <p>Danh sách sách sản phẩm</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;">STT</th>
+                            <th style="width: 45%;">Tên hàng</th>
+                            <th style="width: 15%;">Đơn giá</th>
+                            <th style="width: 15%;">Số lượng</th>
+                            <th style="width: 30%;">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {orderList}
+                        <tr>
+                            <td style="text-align: center;">1</td>
+                            <td>Laptop Asus TUF Gaming A15</td>
+                            <td style="text-align: right;">56.000</td>
+                            <td style="text-align: right;">3</td>
+                            <td style="text-align: right;">172.000</td>
+                        </tr>
+                        <!-- Add more rows as needed -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="total">
+                Tổng tiền: {total} VNĐ
+            </div>
+        </div>
+    </body>
+</html>
