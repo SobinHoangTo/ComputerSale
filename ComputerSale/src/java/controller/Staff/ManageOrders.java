@@ -110,7 +110,10 @@ public class ManageOrders extends HttpServlet {
         request.setAttribute("numberOfPage", (int) Math.ceil((double) numberOfItems / ItemsOfPage));
         request.setAttribute("orders", MyUtils.getArrayListByPaging(list, pageNumber, ItemsOfPage));
         request.setAttribute("odDetails", new Order_detailDAO().getOrderOrderDetails());
+        request.setAttribute("sum", new Order_detailDAO().getOrderTotal());
+        request.setAttribute("total", new OrderDAO().getTotalSales());
         request.setAttribute("compareStatus", compareDates(list, currentDate));
+        request.setAttribute("currentDate", LocalDate.now().toString());
         request.setAttribute("customer", new CustomerDAO().getAll());
         request.setAttribute("employee", new EmployeeDAO().getAll());
         request.setAttribute("serial", new Serial_numberDAO().getAll());
@@ -131,25 +134,25 @@ public class ManageOrders extends HttpServlet {
 
         for (Order order : orders) {
             LocalDate dateFromDB;
-            try {
-                dateFromDB = LocalDate.parse(order.getVerified_on(), formatter);
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Invalid date format for order ID: " + order.getId(), e);
+            if (order.getVerified_on() != null) {
+                try {
+                    dateFromDB = LocalDate.parse(order.getVerified_on(), formatter);
+                } catch (Exception e) {
+                    throw new IllegalArgumentException("Invalid date format for order ID: " + order.getId(), e);
+                }
+                int value;
+                switch (order.getOrder_status()) {
+                    case 1, 3 ->
+                        value = 1;
+                    case 2, 4 ->
+                        value = (dateFromDB.isAfter(currentDate)) ? 0 : 1;
+                    case 5, 6, 7 ->
+                        value = 0;
+                    default ->
+                        throw new AssertionError("Unexpected order status: " + order.getOrder_status());
+                }
+                compareMap.put(order.getId(), value);
             }
-
-            int value;
-            switch (order.getOrder_status()) {
-                case 1, 3 ->
-                    value = 1;
-                case 2, 4 ->
-                    value = (dateFromDB.isAfter(currentDate)) ? 0 : 1;
-                case 5, 6, 7 ->
-                    value = 0;
-                default ->
-                    throw new AssertionError("Unexpected order status: " + order.getOrder_status());
-            }
-
-            compareMap.put(order.getId(), value);
         }
 
         return compareMap;
@@ -180,4 +183,3 @@ public class ManageOrders extends HttpServlet {
     }
 
 }
-

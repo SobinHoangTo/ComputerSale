@@ -38,13 +38,12 @@ public class AddNews extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action_raw = request.getParameter("action");
+        String idStr = request.getParameter("id");
         try {
             int action = Integer.parseInt(action_raw);
             action_raw = (action == 1) ? "save changes" : (action == 2) ? "delete" : "add";
-            String idStr = request.getParameter("id");
-            int id = Integer.parseInt(idStr);
             boolean status = handleAction(request, response, action);
-            MyUtils.setAlertAttributes(request, status, action_raw + " news number " + ((id == 0) ? "" : idStr));
+            MyUtils.setAlertAttributes(request, status, action_raw + " news number ");
 
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
@@ -76,7 +75,6 @@ public class AddNews extends HttpServlet {
 
     private boolean handleAction(HttpServletRequest request, HttpServletResponse response, int action) throws ServletException, IOException {
         boolean isUpdated = false;
-        News d = parseParameter(request, response);
         switch (action) {
             case 1:
                 isUpdated = new NewsDAO().updateNews(parseParameter(request, response));

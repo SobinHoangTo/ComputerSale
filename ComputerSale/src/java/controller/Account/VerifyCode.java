@@ -6,7 +6,6 @@ package controller.Account;
 
 import dal.CustomerDAO;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,10 +28,11 @@ public class VerifyCode extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        System.out.println("Hello");
         String code = request.getParameter("code");
         HttpSession session = request.getSession();
         String trueCode = (String) session.getAttribute("code");
-        if (new MyUtils().getMd5(code).equals(trueCode)) {
+        if (MyUtils.getMd5(code).equals(trueCode)) {
             String username = (String)session.getAttribute("username");
             String email = (String)session.getAttribute("email");
             String password = (String)session.getAttribute("password");
@@ -41,12 +41,11 @@ public class VerifyCode extends HttpServlet {
             String firstname = (String)session.getAttribute("firstname");
             String lastname = (String)session.getAttribute("lastname");
             new CustomerDAO().add(username, email, password, phone, address, firstname, lastname);
-            response.sendRedirect("login");
+            response.sendRedirect("login?message=Register Succcessfully!!!");
         }
         else {
-            request.setAttribute("alertMessage", "Code wrong!!!");
-            request.setAttribute("alertType", "danger");
-            request.getRequestDispatcher("verifycode").forward(request, response);
+            request.setAttribute("message", "Code wrong!!!");
+            request.getRequestDispatcher("Views/Account/ConfirmCode.jsp").forward(request, response);
         }
     }
 

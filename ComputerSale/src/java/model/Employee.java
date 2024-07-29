@@ -9,13 +9,15 @@ public class Employee {
     private String address;
     private String firstname;
     private String lastname;
+    private String img;
     private String reg_date;
     private int role_id;
+    private int status;
 
     public Employee() {
     }
 
-    public Employee(int id, String username, String password, String email, String phone, String address, String firstname, String lastname, String reg_date, int role_id) {
+    public Employee(int id, String username, String password, String email, String phone, String address, String firstname, String lastname, String img, String reg_date, int role_id, int status) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -24,8 +26,10 @@ public class Employee {
         this.address = address;
         this.firstname = firstname;
         this.lastname = lastname;
+        this.img = img;
         this.reg_date = reg_date;
         this.role_id = role_id;
+        this.status = status;
     }
 
     public int getId() {
@@ -92,6 +96,14 @@ public class Employee {
         this.lastname = lastname;
     }
 
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
+    }
+
     public String getReg_date() {
         return reg_date;
     }
@@ -108,10 +120,19 @@ public class Employee {
         this.role_id = role_id;
     }
 
-    @Override
-    public String toString() {
-        return "Employee{" + "id=" + id + ", username=" + username + ", password=" + password + ", email=" + email + ", phone=" + phone + ", address=" + address + ", firstname=" + firstname + ", lastname=" + lastname + ", reg_date=" + reg_date + ", role_id=" + role_id + '}';
+    public int getStatus() {
+        return status;
     }
 
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "Employee{" + "id=" + id + ", username=" + username + ", password=" + password + ", email=" + email + ", phone=" + phone + ", address=" + address + ", firstname=" + firstname + ", lastname=" + lastname + ", img=" + img + ", reg_date=" + reg_date + ", role_id=" + role_id + ", status=" + status + '}';
+    }
+
+   
     
 }

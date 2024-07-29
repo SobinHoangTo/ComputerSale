@@ -56,6 +56,25 @@ public class NewsDAO extends DBContext {
         return get(null);
     }
 
+    public ArrayList<News> getHomeNews() {
+        ArrayList<News> newsList = new ArrayList<>();
+        try {
+            String sql = "SELECT top 3 * FROM news where news_category_id =3 order by create_date";
+
+            PreparedStatement pt = connection.prepareStatement(sql);
+            ResultSet rs = pt.executeQuery();
+            while (rs.next()) {
+                newsList.add(getByRS(rs));
+            }
+            rs.close();
+            pt.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return newsList;
+    }
+
     public ArrayList<News> getManageNews() {
         ArrayList<News> newsList = new ArrayList<>();
         try {
@@ -74,12 +93,13 @@ public class NewsDAO extends DBContext {
         return newsList;
     }
 
-    public ArrayList<News> getHomeNews() {
+    public ArrayList<News> getNewsByCategoryID(int id) {
         ArrayList<News> newsList = new ArrayList<>();
         try {
-            String sql = "SELECT top 3 * FROM news where news_category_id =1 order by create_date";
+            String sql = "SELECT * FROM news where news_category_id = ? order by create_date";
 
             PreparedStatement pt = connection.prepareStatement(sql);
+            pt.setInt(1, id);
             ResultSet rs = pt.executeQuery();
             while (rs.next()) {
                 newsList.add(getByRS(rs));
@@ -121,27 +141,6 @@ public class NewsDAO extends DBContext {
     public ArrayList<News> searchByNewsCategory(int search) {
         return get(" news_category_id = " + search);
     }
-//    public Map<News, Employee> searchByNewTitle(String search) {
-//        Map<News, Employee> newsEmployeeMap = new HashMap<>();
-//        try {
-//            String sql = "SELECT n.*, e.* FROM employee e \n"
-//                    + "INNER JOIN news n ON e.id = n.author "
-//                    + "WHERE title LIKE ?";
-//            PreparedStatement pt = connection.prepareStatement(sql);
-//            pt.setString(1, "%" + search + "%");
-//            ResultSet rs = pt.executeQuery();
-//            while (rs.next()) {
-//                News news = getByRS(rs);
-//                Employee employee = new EmployeeDAO().getByRS(rs);
-//                newsEmployeeMap.put(news, employee);
-//            }
-//            rs.close();
-//            pt.close();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return newsEmployeeMap;
-//    }
 
     public Map<String, News> getAuthorNews(int id) {
         Map<String, News> newsEmployeeMap = new HashMap<>();
@@ -246,7 +245,7 @@ public class NewsDAO extends DBContext {
             ps.setInt(7, news.getStatus());
 
             int rowsUpdated = ps.executeUpdate();
-            return rowsUpdated > 0;
+            return (rowsUpdated > 0);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -268,6 +267,8 @@ public class NewsDAO extends DBContext {
     }
 
     public static void main(String[] args) {
-        System.out.println(new NewsDAO().getHomeNews());
+        News news = new News(0, "Privacy Policy", "We respect your privacy. We use your data to process orders, improve services, and communicate with you. Your information is never shared without consent, except as required by law."
+                ,LocalDate.now().toString(), 1, "At Linh and Associates Store, we respect your privacy and are committed to protecting your personal information. Our privacy policy outlines how we collect, use, and secure your data. We use your information to process orders, improve our services, and communicate with you. Your information is never shared without your consent, except as required by law.", 1, 1);
+        new NewsDAO().addNews(news);
     }
 }

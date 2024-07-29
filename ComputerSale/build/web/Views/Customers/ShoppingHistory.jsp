@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -34,7 +35,7 @@
                 </div>
             </div>
             <div class="container"><br/>
-                <h2>Order History</h2>
+                <h2>Shopping History</h2>
                 <div class="row mb-5">
                     <form class="col-md-12" method="post">
                         <div class="site-blocks-table">
@@ -58,8 +59,30 @@
                                         <tr class="text-nowrap">
                                             <td>${o.id}</td>
                                             <td>${o.order_date}</td>
-                                            <td>${o.order_status}</td>
-                                            <td>${totalPrices[o.id]} VND</td>
+                                            <td>
+                                                <c:if test="${o.order_status == 1}">
+                                                    <p class="badge bg-info">Pending</p>
+                                                </c:if>
+                                                <c:if test="${o.order_status == 2}">
+                                                    <p class="badge bg-danger">Rejected</p>
+                                                </c:if>
+                                                    <c:if test="${o.order_status == 3}">
+                                                    <p class="badge bg-primary">Packaging</p>
+                                                </c:if>
+                                                <c:if test="${o.order_status == 4}">
+                                                    <p class="badge bg-warning">Shipping</p>
+                                                </c:if>
+                                                <c:if test="${o.order_status == 5}">
+                                                    <p class="badge bg-success">Received</p>
+                                                </c:if>
+                                                <c:if test="${o.order_status == 6}">
+                                                    <p class="badge bg-dark">Return goods</p>
+                                                </c:if>
+                                                <c:if test="${o.order_status == 7}">
+                                                    <p class="badge bg-secondary">Receive goods back</p>
+                                                </c:if>
+                                            </td>
+                                            <td><fmt:formatNumber value="${totalPrices[o.id]}" type='number' groupingUsed='true'/> VND</td>
                                             <td><a href="orderdetail?id=${o.id}">View Detail <i class="bi bi-info-circle-fill"></i></a></td>
                                         </tr>
                                     </c:forEach>

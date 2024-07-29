@@ -9,7 +9,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="icon" href="Image/laptop-icon.png" type="image/x-icon">
+        <link rel="icon" href="<%=request.getContextPath()%>/Image/laptop-icon.png" type="image/x-icon">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Login</title>
 
@@ -19,7 +19,7 @@
         <meta content="" name="description">
 
         <!-- Favicon -->
-        <link href="img/favicon.ico" rel="icon">
+        <link href="<%=request.getContextPath()%>/img/favicon.ico" rel="icon">
 
         <!-- Google Web Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,15 +31,24 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
         <!-- Libraries Stylesheet -->
-        <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
-        <link href="lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+        <link href="<%=request.getContextPath()%>/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+        <link href="<%=request.getContextPath()%>/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
 
         <!-- Customized Bootstrap Stylesheet -->
-        <link href="cssE/bootstrap.min.css" rel="stylesheet">
+        <link href="<%=request.getContextPath()%>/cssE/bootstrap.min.css" rel="stylesheet">
 
         <!-- Template Stylesheet -->
         <link href="cssE/style.css" rel="stylesheet">
-
+        <style>
+            .btn-google {
+                background-color: #db4437;
+                color: white;
+            }
+            .btn-google:hover {
+                background-color: #c23321;
+                color: white;
+            }
+        </style>
 
     </head>
     <body>
@@ -49,16 +58,16 @@
                     <div class="bg-white rounded p-4 p-sm-5 my-4 mx-3">
                         <div class="d-flex align-items-center justify-content-center mb-3">
                             <a href="<%=request.getContextPath()%>/home" >
-                                <img title="Back to Home" src="Image/laptop-icon.png" alt="Logo" class="img-fluid rounded" style="max-height: 100px;">
+                                <img title="Back to Home" src="<%=request.getContextPath()%>/Image/laptop-icon.png" alt="Logo" class="img-fluid rounded" style="max-height: 100px;">
                             </a>
                             <h3>Login</h3>
                         </div>
 
                         <form action="<%=request.getContextPath()%>/login" method="post">
-                            <c:if test="${requestScope.message!=null}">
+                            <c:if test="${param.message!=null}">
                                 <div class="form-group">
                                     <div class="alert alert-warning" role="alert">
-                                        ${requestScope.message}
+                                        ${param.message}
                                     </div>
                                 </div>
                             </c:if>
@@ -90,6 +99,12 @@
                             <button type="submit" class="btn btn-primary py-3 w-100 mb-4">Login</button>
                         </form>
 
+                        <a href="https://accounts.google.com/o/oauth2/auth?scope=email%20profile&redirect_uri=http://localhost:9999/ComputerSale/LoginGoogleHandler&response_type=code&client_id=713098932367-stfph64pqcvd0hk2aer3kt7u8crlff48.apps.googleusercontent.com&approval_prompt=force">
+                            <button class="btn btn-google container-fluid">
+                                <i class="fab fa-google"></i> Login with Google
+                            </button>
+                        </a>
+
                         <p class="text-center mb-0">Don't have an Account? <a href="<%=request.getContextPath()%>/register">Sign Up</a></p>
 
                     </div>
@@ -100,16 +115,22 @@
         <!-- JavaScript Libraries -->
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="lib/chart/chart.min.js"></script>
-        <script src="lib/easing/easing.min.js"></script>
-        <script src="lib/waypoints/waypoints.min.js"></script>
-        <script src="lib/owlcarousel/owl.carousel.min.js"></script>
-        <script src="lib/tempusdominus/js/moment.min.js"></script>
-        <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
-        <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+        <script src="<%=request.getContextPath()%>/lib/chart/chart.min.js"></script>
+        <script src="<%=request.getContextPath()%>/lib/easing/easing.min.js"></script>
+        <script src="<%=request.getContextPath()%>/lib/waypoints/waypoints.min.js"></script>
+        <script src="<%=request.getContextPath()%>/lib/owlcarousel/owl.carousel.min.js"></script>
+        <script src="<%=request.getContextPath()%>/lib/tempusdominus/js/moment.min.js"></script>
+        <script src="<%=request.getContextPath()%>/lib/tempusdominus/js/moment-timezone.min.js"></script>
+        <script src="<%=request.getContextPath()%>/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+
+        <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+        <!-- Bootstrap JS and dependencies -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
         <!-- Template Javascript -->
-        <script src="js/main.js"></script>
+        <script src="<%=request.getContextPath()%>/js/main.js"></script>
         <script>
                                         function showPassword() {
                                             var x = document.getElementById("password");

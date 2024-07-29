@@ -28,7 +28,7 @@ public class AuthenticateManager implements Filter{
         HttpSession session = req.getSession();
         Employee eTemp = (Employee)session.getAttribute("currentEmployee");
         if (eTemp != null) {
-            if (eTemp.getRole_id()==2) {
+            if (eTemp.getRole_id()<=2) {
                 fc.doFilter(sr, sr1);
                 return;
             }

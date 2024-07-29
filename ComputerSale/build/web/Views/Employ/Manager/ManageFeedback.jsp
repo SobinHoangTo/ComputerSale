@@ -68,30 +68,32 @@
                 <div class="container-fluid pt-4 px-4">
                     <div class="row bg-light rounded justify-content-center mx-0">
                         <div class="container p-4">
-                            <div class="row">
-                                <h1 class="display-3 col-md-6 mt-2 mb-3">Manage Feedback</h1>
-                                <!-- Search by Name or Email -->
-                                <div class="container col-md-5 mt-2 mb-3 justify-items-end" style="width: 30%; float: right;">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <h1 class="display-3 mt-2 mb-3">Manage Feedback</h1>
+                                </div>
+                                <div class="col-md-4">
                                     <form class="d-flex" role="search" action="managefeedback" method="get">
-                                        <div class="input-group mt-4">
-                                            <c:set var="placeholderText" value="Search by Title" />
+                                        <div class="input-group mt-2 mb-3">
+                                            <c:set var="placeholderText" value="Search by product name, customer name or feedback" />
                                             <c:if test="${not empty requestScope.searchWords}">
                                                 <c:set var="placeholderText" value="Search by Title: ${requestScope.searchWords}" />
                                             </c:if>
-                                            <input class="form-control me-2" type="search" 
-                                                   placeholder="${placeholderText}"
-                                                   aria-label="Search" name="search">
+                                            <input class="form-control" type="search" placeholder="${placeholderText}" aria-label="Search" name="search">
                                             <button class="btn btn-outline-success" type="submit">
                                                 <i class="bi bi-search"></i>
                                             </button>
                                         </div>
                                     </form>
                                 </div>
-                                <div class="container col-md-1  mt-4 mb-3 ">
-                                    <a href="managefeedback" class="btn btn-primary">Get All</a>
+                                <div class="col-md-2">
+                                    <div class="d-grid gap-2" style="width: 80%;">
+                                        <a href="managefeedback" class="btn btn-primary">
+                                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
-
 
                             <!-- Alert Message -->
                             <c:if test="${not empty requestScope.alertMessage}">
@@ -118,22 +120,27 @@
                                                 <tr>
                                                     <td>${entry.key.id}</td>
                                                     <td style="max-width: 80px; width: 25%;">
-                                                        <a href="productdetails?id= ${entry.value.id}"
-                                                           class="text-decoration-none text-dark">
-                                                             <div class="card text-bg-light">
-                                                                <img src="<%=request.getContextPath()%>/Image/Products/laptops-2048px-5607.png" 
-                                                                     class="card-img" alt="...">
-                                                                <div class="card-img-overlay d-flex align-items-end">
-                                                                    <p class="card-title" style="color: white;">${entry.value.name}</p>
-                                                                </div>
-                                                            </div>
-
+                                                        <a href="productdetails?id=${entry.value.id}"
+                                                           >${entry.value.name}
                                                         </a>
                                                     </td> 
-                                                    <td>${entry.key.star_rate}</td>
+                                                    <td>
+                                                        <c:forEach var="i" begin="1" end="5">
+                                                            <c:choose>
+                                                                <c:when test="${i <= entry.key.star_rate}">
+                                                                    <i class="bi bi-star-fill text-warning"></i> <!-- Filled star -->
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <i class="bi bi-star text-warning"></i> <!-- Empty star -->
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </c:forEach>
+                                                        ${entry.key.star_rate}
+                                                    </td>
                                                     <td>
                                                         <c:forEach items="${customerList}" var="customer">
-                                                            ${customer.key==entry.key.id?customer.value.username:''}
+                                                            ${customer.key==entry.key.id?customer.value.firstname:''}
+                                                            ${customer.key==entry.key.id?customer.value.lastname:''}
                                                         </c:forEach>
                                                     </td>
                                                     <td>${entry.key.feedback}</td>

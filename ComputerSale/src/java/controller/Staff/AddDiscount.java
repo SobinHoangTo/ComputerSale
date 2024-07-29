@@ -52,24 +52,24 @@ public class AddDiscount extends HttpServlet {
             LocalDate endDate = LocalDate.parse(expDate);
             boolean checkNumber = quantity > 0 && value > 0;
             boolean checkDate = endDate.isAfter(LocalDate.now()) && startDateCheck.isAfter(LocalDate.now());
-
-            boolean isUpdated = false;
+            boolean checkValid = endDate.isAfter(startDateCheck);
+            boolean isUpdated=false;
             if (checkNumber) {
-                if (checkDate) {
-                    int id = Integer.parseInt(request.getParameter("id"));
-                    isUpdated = new DiscountDAO().addDiscount(new Discount(id, productId, quantity, value, startDate, expDate, quantity, value));
-                } else {
-                    MyUtils.setAlertAttributes(request, false, "Start date or Experation Date is not in the future");
+                if (checkDate && checkValid) {
+                    Discount d = new Discount(0, productId, quantity, value, startDate, expDate, currentE.getId(), 0);
+                    isUpdated = new DiscountDAO().addDiscount(d);
+                     MyUtils.setAlertAttributes(request, isUpdated, "add new discount");
+                     doGet(request, response);
+                } else if (checkDate == false||checkValid==false) {
+                    MyUtils.setAlertAttributes(request, false, "Start date or Experation Date is not in the future, and Start date must be before Experation Date");
                     doGet(request, response);
-                }
+                } 
             } else {
-                MyUtils.setAlertAttributes(request, checkDate, "Quantity or Values is smaller than 0.");
+                MyUtils.setAlertAttributes(request, checkNumber, "Quantity or Values is smaller than 0.");
                 doGet(request, response);
             }
-            MyUtils.setAlertAttributes(request, isUpdated, "add new discount");
+           
         } catch (Exception e) {
         }
-
-        doGet(request, response);
     }
 }

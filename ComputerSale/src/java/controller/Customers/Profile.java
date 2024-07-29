@@ -15,12 +15,21 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import javax.imageio.ImageIO;
 import model.Customer;
 
 @MultipartConfig(maxFileSize = 16 * 1024 * 1024)
 public class Profile extends HttpServlet {
+
+    private static final Pattern NAME_PATTERN = Pattern.compile("^[A-Za-z]{2,20}$");
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^(09|03|07|08)\\d{8,9}$");
+    private static final Pattern ADDRESS_PATTERN = Pattern.compile("^.{10,80}$");
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[A-Z])(?=.*[!@#$&*?])\\S{8,}$");
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -79,12 +88,32 @@ public class Profile extends HttpServlet {
         String imgFileName = getFileName(imgPart);
 
         String applicationPath = getServletContext().getRealPath("");
-        String uploadPath = applicationPath.replace("build\\web", "") + "web" + File.separator + "Image" + File.separator + "Customers";
+        String uploadPath = applicationPath.replace("build\\web", "") + "web" + File.separator + "Image" + File.separator + "Avatar" + File.separator + "Customer";
 
         if (imgFileName != null && !imgFileName.isEmpty()) {
-            File logoFile = new File(uploadPath + File.separator + imgFileName);
+            // Xác thực tệp tin hình ảnh
             try (InputStream fileContent = imgPart.getInputStream()) {
-                Files.copy(fileContent, logoFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                if (ImageIO.read(fileContent) == null) {
+                    response.sendRedirect("profile?mess=Invalid image file.&alertType=danger");
+                    return;
+                }
+                // Đặt lại InputStream
+                imgPart = request.getPart("img");
+            }
+
+            File imgFile = new File(uploadPath + File.separator + imgFileName);
+
+            // Đổi tên tệp nếu đã tồn tại
+            if (imgFile.exists()) {
+                String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+                String fileExtension = imgFileName.substring(imgFileName.lastIndexOf("."));
+                String fileNameWithoutExtension = imgFileName.substring(0, imgFileName.lastIndexOf("."));
+                imgFileName = fileNameWithoutExtension + "_" + timestamp + fileExtension;
+                imgFile = new File(uploadPath + File.separator + imgFileName);
+            }
+
+            try (InputStream fileContent = imgPart.getInputStream()) {
+                Files.copy(fileContent, imgFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -95,21 +124,43 @@ public class Profile extends HttpServlet {
         try {
             Thread.sleep(3000);
         } catch (InterruptedException ex) {
-            Logger.getLogger(ManageBrand.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Profile.class.getName()).log(Level.SEVERE, null, ex);
         }
-        boolean status = new CustomerDAO().editProfile(email, phone, address, fname, lname, imgFileName, id);
+
+        String errorMessage = null;
+        if (!NAME_PATTERN.matcher(fname).matches()) {
+            errorMessage = "First name must be 2-20 characters long and contain only text.";
+        } else if (!NAME_PATTERN.matcher(lname).matches()) {
+            errorMessage = "Last name must be 2-20 characters long and contain only text.";
+        }else if (!PHONE_PATTERN.matcher(phone).matches()) {
+            if (!phone.startsWith("09") && !phone.startsWith("03") && !phone.startsWith("07") && !phone.startsWith("08")) {
+                errorMessage = "Phone number does not start with 09, 03, 07, or 08.";
+            } else {
+                errorMessage = "Phone number must be 10-11 digits long.";
+            }
+        } else if (!ADDRESS_PATTERN.matcher(address).matches()) {
+            errorMessage = "Address must be 10-80 characters long.";
+        }
+
+        if (errorMessage != null) {
+            response.sendRedirect("profile?mess=" + errorMessage + "&alertType=danger");
+            return;
+        }
+
+        boolean status = new CustomerDAO().editProfile(phone, address, fname, lname, imgFileName, id);
 
         if (status) {
             profile.setFirstname(fname);
             profile.setLastname(lname);
-            profile.setEmail(email);
             profile.setPhone(phone);
             profile.setAddress(address);
             profile.setImg(imgFileName);
             session.setAttribute("currentCustomer", profile);
+            response.sendRedirect("profile?mess=Change success&alertType=success");
+        } else {
+            response.sendRedirect("profile?mess=Edit Fail&alertType=danger");
         }
-        response.sendRedirect("profile?mess=" + (status ? "Edit Success" : "Edit Fail") + "&alertType=" + (status ? "success" : "danger"));
-     }
+    }
 
     private void changePassword(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -120,20 +171,24 @@ public class Profile extends HttpServlet {
         String newPassword = request.getParameter("new_password");
         String confirmPassword = request.getParameter("confirm_password");
 
-        if (!newPassword.equals(confirmPassword)) {
-            response.sendRedirect("profile?mess=Failed to confirm Password.&alertType=danger");
-            return;
+        String errorMessage = null;
+        if (!new CustomerDAO().checkPassWord(oldPassword, id)) {
+            errorMessage = "Wrong Password.";
+        } else if (oldPassword.equals(newPassword)) {
+            errorMessage = "New password is the same as the current password.";
+        } else if (newPassword.length() < 8) {
+            errorMessage = "Password is too short";
+        } else if (!PASSWORD_PATTERN.matcher(newPassword).matches()) {
+            errorMessage = "Pass must contain at least one uppercase letter and one special character. Cannot cotain space!";
+        } else if (!newPassword.equals(confirmPassword)) {
+            errorMessage = "Failed to confirm Password.";
         }
 
-        if (new CustomerDAO().checkPassWord(oldPassword, id)) {
-            if (oldPassword.equals(newPassword)) {
-                response.sendRedirect("profile?mess=New password are current password.&alertType=danger");
-                return;
-            }
+        if (errorMessage != null) {
+            response.sendRedirect("profile?mess=" + errorMessage + "&alertType=danger");
+        } else {
             new CustomerDAO().changePassword(id, newPassword);
             response.sendRedirect("profile?mess=Password is changed.&alertType=success");
-        } else {
-            response.sendRedirect("profile?mess=Wrong Password.&alertType=danger");
         }
     }
 

@@ -171,15 +171,17 @@
                                                                 </form>
                                                             </div>
                                                         </c:if>
-                                                        <!-- Delete Button -->
-                                                        <div class="col-auto">
-                                                            <form action="managenewscategory" method="POST">
-                                                                <input type="hidden" id="id" name="id" value="${c.id}">
-                                                                <button type="submit" class="btn btn-danger btn-sm"  title="Delete" name="action" value="delete">
-                                                                    <i class="bi bi-trash"></i>
-                                                                </button>
-                                                            </form>
-                                                        </div>
+                                                        <c:if test="${c.id > 2}">
+                                                            <!-- Delete Button -->
+                                                            <div class="col-auto">
+                                                                <form action="managenewscategory" method="POST">
+                                                                    <input type="hidden" id="id" name="id" value="${c.id}">
+                                                                    <button type="submit" class="btn btn-danger btn-sm"  title="Delete" name="action" value="delete">
+                                                                        <i class="bi bi-trash"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </c:if>
                                                     </div>
                                                 </td>
                                             </tr>

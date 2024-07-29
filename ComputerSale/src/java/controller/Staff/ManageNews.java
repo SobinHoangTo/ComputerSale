@@ -9,13 +9,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Comparator;
 import model.*;
 import util.MyUtils;
 
 public class ManageNews extends HttpServlet {
-
+    
     private final int ItemsOfPage = 10;
-
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -30,7 +31,7 @@ public class ManageNews extends HttpServlet {
             if (searchResults == null) {
                 searchResults = newsDAO.getManageNews(); // Retrieve all if not already stored in session
             }
-
+            
             if (searchQuery != null && !searchQuery.isEmpty()) {
                 searchResults = newsDAO.searchByNewString(searchQuery.trim());
                 status = !searchResults.isEmpty();
@@ -38,7 +39,7 @@ public class ManageNews extends HttpServlet {
             } else if (categoryFilter != null && !categoryFilter.isEmpty()) {
                 int categoryId = Integer.parseInt(categoryFilter);
                 searchResults = (categoryId == 0) ? newsDAO.getManageNews() : newsDAO.searchByNewsCategory(categoryId);
-
+                
             }
 
             // If searchResults is still null or empty, return all employees
@@ -46,7 +47,7 @@ public class ManageNews extends HttpServlet {
                 searchResults = newsDAO.getManageNews();
                 session.setAttribute("nMap", searchResults);
             }
-
+            searchResults.sort(Comparator.comparingInt(News::getId).reversed());
             String pageNumberParam = request.getParameter("pageNumber");
             int pageNumber = pageNumberParam != null ? Integer.parseInt(pageNumberParam) : 1;
             int numberOfItems = searchResults.size();
@@ -63,13 +64,13 @@ public class ManageNews extends HttpServlet {
         }
         request.getRequestDispatcher("Views/Employ/Staff/ManageNews.jsp?pageNumber=").forward(request, response);
     }
-
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         doGet(request, response);
     }
-
+    
     @Override
     public String getServletInfo() {
         return "Servlet for managing news by staff";

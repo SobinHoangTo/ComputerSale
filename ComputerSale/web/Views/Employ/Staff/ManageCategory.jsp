@@ -4,7 +4,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Manage Category</title>
+        <title>Manage Product Category</title>
         <!-- Bootstrap CSS -->
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
         <meta content="" name="keywords">
@@ -37,7 +37,7 @@
                 <div class="container-fluid pt-4 px-4">
                     <div class="row bg-light rounded justify-content-center mx-0">
                         <div class="container p-2">
-                            <h1 class="display-3 p-4">Manage Category</h1>
+                            <h1 class="display-3 p-4">Manage Product Category</h1>
                             <!-- Search Bar and Add Category Button -->
                             <div class="container d-flex justify-content-between mb-3">
                                 <!-- Search Bar -->
@@ -82,7 +82,7 @@
                                                 <input type="hidden" name="action" value="add">
                                                 <!-- Name -->
                                                 <div class="mb-3">
-                                                    <label for="name" class="form-label"><strong>Name Category</strong></label>
+                                                    <label for="name" class="form-label"><strong>Name Category<span class="text-danger"> (*)</span></strong></label>
                                                     <input type="text" class="form-control" name="name" required>
                                                 </div>
                                                 <!-- Submit Button -->
@@ -95,10 +95,15 @@
 
                             <!-- Category Table -->
                             <div class="container mt-4">
+                                <c:if test="${not empty alertMessage}">
+                                    <div class="alert alert-${alertType} alert-dismissible fade show" role="alert">
+                                        ${alertMessage}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                </c:if>
                                 <div class="table-responsive">
                                     <!-- Category Table -->
                                     <table class="table table-bordered table-striped">
-
                                         <thead class="table-light">
                                             <tr class="text-nowrap">
                                                 <th>ID</th>
@@ -107,7 +112,7 @@
                                                 <th>Created On</th>
                                                 <th>Modified By</th>
                                                 <th>Modified On</th>
-                                                <th>Actions</th>
+                                                <th class="text-center">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -124,15 +129,15 @@
                                                     <td  class="text-end">${c.created_on}</td>
                                                     <td  class="text-end">${c.modified_by}</td>
                                                     <td  class="text-end">${c.modified_on}</td>
-                                                    <td>
+                                                    <td class="text-center">
                                                         <c:if test="${c.getStatus() != 0}">
                                                             <div class="btn-group" role="group" aria-label="Category Actions">
                                                                 <form action="managecategory" method="post">
                                                                     <input type="hidden" name="action" value="hidden">
                                                                     <input type="hidden" name="id" value="${c.id}">
                                                                     <!-- Display Status Button -->
-                                                                    <button type="submit" class="btn btn-info btn-sm" title="Hidden" data-bs-toggle="modal">
-                                                                        <i class="bi bi-eye"></i>
+                                                                    <button type="submit" class="btn btn-outline-success btn-sm" title="Hidden" data-bs-toggle="modal">
+                                                                        <i class="bi bi-toggle-on"></i>
                                                                     </button>
                                                                 </form>
                                                             </div>
@@ -144,8 +149,8 @@
                                                                     <input type="hidden" name="action" value="display">
                                                                     <input type="hidden" name="id" value="${c.id}">
                                                                     <!-- Display Status Button -->
-                                                                    <button type="submit" class="btn btn-secondary btn-sm" title="Display" data-bs-toggle="modal">
-                                                                        <i class="bi bi-eye"></i>
+                                                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Display" data-bs-toggle="modal">
+                                                                        <i class="bi bi-toggle-off"></i>
                                                                     </button>
                                                                 </form>
                                                             </div>
@@ -159,14 +164,6 @@
                                                         </div>
 
                                                         <div class="btn-group" role="group" aria-label="Category Actions">
-                                                            <form action="managecategory" method="post">
-                                                                <input type="hidden" name="action" value="delete">
-                                                                <input type="hidden" name="id" value="${c.id}">
-                                                                <button type="submit" class="btn btn-danger btn-sm me-3" title="Delete" id="deleteButton">
-                                                                    <i class="bi bi-trash"></i>
-                                                                </button>
-                                                            </form>
-
                                                             <div class="modal fade" id="editCategoryModal${c.id}" tabindex="-1" aria-labelledby="editCategoryModalLabel${c.id}" aria-hidden="true">
                                                                 <div class="modal-dialog modal-dialog-centered">
                                                                     <div class="modal-content bg-light">
@@ -181,7 +178,7 @@
                                                                             <form action="managecategory" method="post">
 
                                                                                 <div class="form-group mb-3">
-                                                                                    <label for="name" class="form-label"><strong>Name</strong></label>
+                                                                                    <label for="name" class="form-label"><strong>Name<span class="text-danger"> (*)</span></strong></label>
                                                                                     <input type="text" class="form-control" name="name" value="${c.getName()}" required>
                                                                                 </div>
                                                                                 <input type="hidden" name="action" value="edit">
@@ -201,6 +198,74 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                <!--pagination-->
+                                <nav aria-label="Page navigation">
+                                    <ul class="pagination justify-content-end">
+                                        <li class="page-item"><a class="page-link" href="<%=request.getContextPath()%>/managecategory?pageNumber=1">Previous</a></li>
+                                            <c:if test="${param.pageNumber==1}">
+                                            <li class="page-item disabled">
+                                                <a class="page-link" href="<%=request.getContextPath()%>/managecategory?pageNumber=${(param.pageNumber-1)<1?requestScope.numberOfPage:(param.pageNumber-1)}" aria-label="Previous">
+                                                    <span aria-hidden="true">&laquo;</span>
+                                                    <span class="sr-only">Previous</span>
+                                                </a>
+                                            </li>
+                                        </c:if>
+                                        <c:if test="${requestScope.numberOfPage<=5}">
+                                            <c:forEach begin="1" end="${requestScope.numberOfPage}" var="i">
+                                                <li class="page-item ${i==param.pageNumber?"active":""}">
+                                                    <a class="page-link" href="<%=request.getContextPath()%>/managecategory?pageNumber=${i}">${i}</a>
+                                                </li>
+                                            </c:forEach>
+                                        </c:if>
+                                        <c:if test="${requestScope.numberOfPage>5}">
+                                            <c:choose>
+                                                <c:when test="${param.pageNumber-3<=0}">
+                                                    <c:forEach begin="1" end="5" var="i">
+                                                        <li class="page-item ${i==param.pageNumber?"active":""}">
+                                                            <a class="page-link" href="<%=request.getContextPath()%>/managecategory?pageNumber=${i}">${i}</a>
+                                                        </li>
+                                                    </c:forEach>
+                                                    <li>
+                                                        <a class="page-link" href="#">...</a>
+                                                    </li>
+                                                </c:when>
+                                                <c:when test="${param.pageNumber+2>=requestScope.numberOfPage}">
+                                                    <li>
+                                                        <a class="page-link" href="#">...</a>
+                                                    </li>
+                                                    <c:forEach begin="${requestScope.numberOfPage-4}" end="${requestScope.numberOfPage}" var="i">
+                                                        <li class=" ${i==param.pageNumber?"active":""}">
+                                                            <a class="page-link" href="<%=request.getContextPath()%>/managecategory?pageNumber=${i}">${i}</a>
+                                                        </li>
+                                                    </c:forEach>
+
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <li>
+                                                        <a class="page-link" href="#">...</a>
+                                                    </li>
+                                                    <c:forEach begin="${param.pageNumber-2}" end="${param.pageNumber+2}" var="i">
+                                                        <li class="page-item ${i==param.pageNumber?"active":""}">
+                                                            <a class="page-link" href="<%=request.getContextPath()%>/managecategory?pageNumber=${i}">${i}</a>
+                                                        </li>
+                                                    </c:forEach>
+                                                    <li>
+                                                        <a class="page-link" href="#">...</a>
+                                                    </li>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </c:if>
+                                        <li class="page-item">
+                                            <a class="page-link"
+                                               href="<%=request.getContextPath()%>/managecategory?pageNumber=${(param.pageNumber+1)>requestScope.numberOfPage?1:(param.pageNumber+1)}"
+                                               aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                                <span class="sr-only">Next</span>
+                                            </a>
+                                        </li>
+                                        <li class="page-item"><a class="page-link" href="<%=request.getContextPath()%>/managecategory?pageNumber=${numberOfPage}">End</a></li>
+                                    </ul>
+                                </nav>
                             </div>
                         </div>
                     </div>

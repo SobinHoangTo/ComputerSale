@@ -9,7 +9,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="icon" href="Image/laptop-icon.png" type="image/x-icon">
+        <link rel="icon" href="<%=request.getContextPath()%>/Image/laptop-icon.png" type="image/x-icon">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Header</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -32,17 +32,18 @@
                     <div class="row align-items-center">
 
                         <div class="col-6 col-md-4 order-2 order-md-1 site-search-icon text-left">
-                            <form action="" class="site-block-top-search row">
+                            <form action="productslist" class="site-block-top-search row">
                                 <!--<span class="icon icon-search2"></span>-->
                                 <!--<span class="bi bi-search"></span>-->
-                                <input type="text" class="form-control border-0" placeholder="Search">
+                                <input type="text" value="${param.search}" name="search" class="form-control border-0" placeholder="Search">
+                                <button class="btn btn-outline-success" type="submit" id="search-icon"><span class="bi bi-search"></span></i></button>
                             </form>
                         </div>
 
                         <div class="col-12 mb-3 mb-md-0 col-md-4 order-1 order-md-2 text-center">
                             <div class="">
-                                <a href="home" class="js-logo-clone">
-                                    <img src="Image/laptop-icon.png" width="50" height="height" alt="alt"/>
+                                <a href="<%=request.getContextPath()%>/home" class="js-logo-clone">
+                                    <img src="<%=request.getContextPath()%>/Image/laptop-icon.png" width="50" height="height" alt="alt"/>
                                 </a>
                             </div>
                         </div>
@@ -58,18 +59,21 @@
                                         </c:if>
                                         <c:if test="${sessionScope.currentCustomer != null}">
                                             <div class="dropdown">
-                                                <a href="profile" class="dropdown-toggle" id="profileDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <a href="<%=request.getContextPath()%>/profile" class="dropdown-toggle" id="profileDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                     <span class="bi bi-person-circle"></span>
                                                 </a>
                                                 <ul class="dropdown-menu" aria-labelledby="profileDropdown" style="min-width: 150px;">
-                                                    <li><a class="dropdown-item" href="profile"><span class="bi bi-person-circle"></span> Profile</a></li>
-                                                    <li><a class="dropdown-item" href="shoppinghistory"><span class="bi bi-arrow-through-heart-fill"></span>Shopping History</a></li>
-                                                    <li><a class="dropdown-item" href="login"><i class="bi bi-box-arrow-in-right"></i> Logout</a></li>
+                                                    <li><a class="dropdown-item" href="<%=request.getContextPath()%>/profile"><span class="bi bi-person-circle"></span> Profile</a></li>
+                                                    <li><a class="dropdown-item" href="<%=request.getContextPath()%>/shoppinghistory"><span class="bi bi-arrow-through-heart-fill"></span>Shopping History</a></li>
+                                                    <li><a class="dropdown-item" href="<%=request.getContextPath()%>/login"><i class="bi bi-box-arrow-in-right"></i> Logout</a></li>
                                                 </ul>
                                             </div>
                                         </c:if>
                                     </li>
-                                    <li><a href="shoppinghistory"><span class="bi bi-arrow-through-heart-fill"></span></a></li>
+                                    <c:if test="${sessionScope.currentEmployee!=null}">
+                                        <li><a href="<%=request.getContextPath()%>/employeehome"><span class="bi bi-arrow-through-heart-fill"></span></a></li>
+                                            </c:if>
+
                                     <li>
                                         <a href="<%=request.getContextPath()%>/carts" class="site-cart">
                                             <!--<span class="icon icon-shopping_cart"></span>-->
@@ -90,18 +94,26 @@
                     <ul class="site-menu js-clone-nav d-none d-md-block">
                         <li><a href="<%=request.getContextPath()%>/home">Home</a></li>
                         <li class="has-children">
-                            <a href="productslist">Product</a>
+                            <a href="<%=request.getContextPath()%>/productslist">Product</a>
                             <ul class="dropdown">
                                 <c:forEach items="${requestScope.categoryList}" var="c">
-                                    <li><a href="productslist">${c.getName()}</a></li>
+                                    <li><a href="<%=request.getContextPath()%>/productslist?filter=1&category=${c.getId()}">${c.getName()}</a></li>
                                     </c:forEach>
                             </ul>
                         </li>
                         <li class="has-children">
-                            <a href="news?id=">About us</a>
+                            <a href="<%=request.getContextPath()%>/productslist">Brand</a>
                             <ul class="dropdown">
-                                <c:forEach items="${requestScope.categoryList}" var="c">
-                                    <li><a href="productslist">${c.getName()}</a></li>
+                                <c:forEach items="${requestScope.brandHeader}" var="c">
+                                    <li><a href="<%=request.getContextPath()%>/productslist?filter=1&brand=${c.getId()}">${c.getName()}</a></li>
+                                    </c:forEach>
+                            </ul>
+                        </li>
+                        <li class="has-children">
+                            <a href="<%=request.getContextPath()%>/news?id=1">${newsHeaderName.name}</a>
+                            <ul class="dropdown">
+                                <c:forEach items="${requestScope.newsHeader}" var="c">
+                                    <li><a href="<%=request.getContextPath()%>/news?id=${c.id}">${c.title}</a></li>
                                     </c:forEach>
                             </ul>
                         </li>

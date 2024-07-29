@@ -48,6 +48,10 @@ public class BrandDAO extends DBContext {
         return get(null);
     }
 
+    public ArrayList<Brand> getAllByActiveStatus() {
+        return get("status = 1");
+    }
+    
     public boolean addBrand(String name, String logo, String link, int created_by) {
         try {
             String sql = "INSERT INTO [dbo].[brand] "
@@ -89,67 +93,6 @@ public class BrandDAO extends DBContext {
             return false;
         }
         return true;
-    }
-
-    public boolean deleteBrand(int id) {
-        try {
-            connection.setAutoCommit(false);
-
-            String sql1 = "DELETE pi FROM [dbo].[product_image] pi "
-                    + "JOIN [dbo].[product] p ON pi.product_id = p.id "
-                    + "WHERE p.brand_id = ?";
-            PreparedStatement st1 = connection.prepareStatement(sql1);
-            st1.setInt(1, id);
-            st1.executeUpdate();
-
-            String sql2 = "DELETE d FROM [dbo].[discount] d "
-                    + "JOIN [dbo].[product] p ON d.product_id = p.id "
-                    + "WHERE p.brand_id = ?";
-            PreparedStatement st2 = connection.prepareStatement(sql2);
-            st2.setInt(1, id);
-            st2.executeUpdate();
-
-            String sql3 = "DELETE sn FROM [dbo].[serial_number] sn "
-                    + "JOIN [dbo].[product] p ON sn.product_id = p.id "
-                    + "WHERE p.brand_id = ?";
-            PreparedStatement st3 = connection.prepareStatement(sql3);
-            st3.setInt(1, id);
-            st3.executeUpdate();
-
-            String sql4 = "DELETE od FROM [dbo].[order_detail] od "
-                    + "JOIN [dbo].[product] p ON od.product_id = p.id "
-                    + "WHERE p.brand_id = ?";
-            PreparedStatement st4 = connection.prepareStatement(sql4);
-            st4.setInt(1, id);
-            st4.executeUpdate();
-
-            String sql5 = "DELETE FROM [dbo].[product] WHERE brand_id = ?";
-            PreparedStatement st5 = connection.prepareStatement(sql5);
-            st5.setInt(1, id);
-            st5.executeUpdate();
-
-            String sql6 = "DELETE FROM [dbo].[brand] WHERE id = ?";
-            PreparedStatement st6 = connection.prepareStatement(sql6);
-            st6.setInt(1, id);
-            st6.executeUpdate();
-
-            connection.commit(); // Kết thúc giao dịch
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            try {
-                connection.rollback(); // Rollback giao dịch nếu có lỗi xảy ra
-            } catch (SQLException rollbackEx) {
-                rollbackEx.printStackTrace();
-            }
-            return false;
-        } finally {
-            try {
-                connection.setAutoCommit(true); // Đặt lại chế độ tự động commit
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
     }
 
     public boolean hiddenBrand(int id) {
@@ -199,9 +142,15 @@ public class BrandDAO extends DBContext {
             stBrand.executeUpdate();
 
             // Cập nhật trạng thái của các sản phẩm liên quan
-            String sqlProduct = "UPDATE [dbo].[product]\n"
-                    + "   SET [status] = 1\n"
-                    + " WHERE [brand_id] = ?";
+            String sqlProduct = """
+                                UPDATE product 
+                                SET status = 1 
+                                WHERE id IN (
+                                    SELECT p.id 
+                                    FROM product p 
+                                    JOIN category c ON c.id = p.category_id
+                                    WHERE c.status = 1
+                                ) and [brand_id] = ?""";
             PreparedStatement stProduct = connection.prepareStatement(sqlProduct);
             stProduct.setInt(1, id);
             stProduct.executeUpdate();
@@ -359,6 +308,6 @@ public class BrandDAO extends DBContext {
     }
 
     public static void main(String[] args) {
-        System.out.println(new BrandDAO().searchBrandByKeyWord("e", 1, 3));
+        System.out.println(new BrandDAO().getAll());
     }
 }

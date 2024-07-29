@@ -106,46 +106,6 @@
                                     <a href="addnews" class="btn btn-primary">Add news</a>
                                 </div>
 
-                                <!-- Add News Modal -->
-                                <div class="modal fade" id="addNewsModal" tabindex="-1" aria-labelledby="addNewsModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="addNewsModalLabel">Add News</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <form action="managenews" method="post">
-                                                    <div class="mb-3">
-                                                        <label for="newNewsTitle" class="form-label"><strong>Title:</strong></label>
-                                                        <input type="text" class="form-control" id="newNewsTitle" name="title" required>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label for="newShortDescription" class="form-label"><strong>Short Description:</strong></label>
-                                                        <input type="text" class="form-control" id="newShortDescription" name="shortDescription" required>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label for="newNewsDetail" class="form-label"><strong>News Details:</strong></label>
-                                                        <textarea class="form-control" id="newNewsDetail" name="newsDetail" rows="5" required></textarea>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label for="newCategoryId" class="form-label"><strong>Category:</strong></label>
-                                                        <select class="form-select" name="news_category_id" id="newCategoryId" required>
-                                                            <c:forEach var="category" items="${categoryList}">
-                                                                <option value="${category.id}">${category.name}</option>
-                                                            </c:forEach>
-                                                        </select>
-                                                    </div>
-                                                    <div class="text-end">
-                                                        <button type="submit" class="btn btn-success" name="action" value="add">Add News</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-
                             </div>
 
                             <div class="container-fluid col-md-12 p-4">
@@ -201,10 +161,16 @@
                                                 </td>
                                                 <td style="text-align: center;">
                                                     <!-- View Button --> 
-                                                    <a href="addnews?newsid=${entry.id}" class="btn btn-primary btn-sm" title="View">
-                                                        <i class="bi bi-eye"></i>
-                                                    </a>
-
+                                                    <c:if test="${entry.id>1}">
+                                                        <a href="addnews?newsid=${entry.id}" class="btn btn-primary btn-sm" title="View">
+                                                            <i class="bi bi-eye"></i>
+                                                        </a>
+                                                    </c:if>
+                                                    <c:if test="${entry.id==1}">
+                                                        <a href="editstoreinfo?newsid=${entry.id}" class="btn btn-primary btn-sm" title="View">
+                                                            <i class="bi bi-eye"></i>
+                                                        </a>
+                                                    </c:if>
                                                 </td>
                                             </tr>
                                         </c:forEach>

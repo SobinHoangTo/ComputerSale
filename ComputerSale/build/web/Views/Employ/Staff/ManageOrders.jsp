@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -210,8 +211,10 @@
 
                 <div class="container-fluid pt-4 px-4">
                     <div class="row bg-light rounded p-2 mx-0">
-                        <h1 class="text-dark mt-3 mb-2 display-3">Manage Orders</h1>
-
+                        <div class="container row">
+                            <h1 class="text-dark  col-md-6 mt-3 mb-2 display-3">Manage Orders</h1><fmt:formatNumber value="${i.price}" type='number' groupingUsed='true'/> 
+                            <h5 class="text-danger col-md-6 mt-3 mb-2  display-4"style="text-align: right;">Total: <fmt:formatNumber value="${total}" type='number' groupingUsed='true'/> VND (SOLD)</h5>
+                        </div>
                         <!-- Search by Name or Email -->
                         <div class="container col-md-6 mb-3" style="width: 60%; float: right;">
                             <form class="d-flex" role="search" action="manageorders" method="get">
@@ -251,12 +254,6 @@
                             </form>
                         </div>
 
-                        <!-- End Search -->
-                        <!--Add orders-->
-                        <!--                        <div class="container mt-4 col-md-3" style="width: 18%;">
-                                                    <a href="addorders" class="btn btn-primary">Add Orders</a>
-                                                </div>-->
-
                         <div class="container p-4">
                             <c:if test="${not empty alertMessage}">
                                 <div class="alert alert-${alertType} alert-dismissible fade show" role="alert">
@@ -269,11 +266,10 @@
                                     <thead>
                                         <tr class="text-center">
                                             <th style="width: 5%;">Code</th>
-                                            <th style="width: 15%;">Customer Name</th>
+                                            <th style="width: 30%;">Customer Name</th>
                                             <th style="width: 10%;">Phone</th>
                                             <th style="width: 20%;">Customer Note</th>
-                                            <th style="width: 15%;">Verify by</th>
-                                            <th style="width: 15%;">Verify on</th>
+                                            <th style="width: 15%;">Amount</th>
                                             <th style="width: 15%;">Status</th>
                                             <th style="width: 5%;">Action</th>
                                         </tr>
@@ -282,21 +278,23 @@
                                         <c:forEach var="order" items="${orders}">
                                             <tr>
                                                 <td style="text-align: center;">${order.id}</td>
+
                                                 <c:forEach items="${customer}" var="c">
                                                     <c:if test="${order.customer_id == c.id}">
                                                         <td>${c.firstname} ${c.lastname}</td>
                                                         <td style="text-align: center;">${c.phone}</td>
                                                     </c:if>
                                                 </c:forEach>
+
                                                 <td>${order.note}</td>
-                                                <td style="text-align: center;">
-                                                    <c:forEach items="${employee}" var="e">
-                                                        <c:if test="${order.verified_by == e.id}">
-                                                            ${e.firstname} ${e.lastname}
+
+                                                <td style="text-align: right;">
+                                                    <c:forEach items="${sum}" var="e">
+                                                        <c:if test="${order.id == e.key}">
+                                                            <fmt:formatNumber value="${e.value}" type='number' groupingUsed='true'/>
                                                         </c:if>
                                                     </c:forEach>
                                                 </td>
-                                                <td>${order.verified_on}</td>
                                                 <td style="text-align: center;">
                                                     <c:choose>
                                                         <c:when test="${compareStatus[order.id] == 1}">
@@ -305,10 +303,10 @@
                                                                 <input type="hidden" name="orderId" value="${order.id}"/>
                                                                 <div class="input-group">
                                                                     <select class="form-select form-select-sm" id="status" name="status">
-                                                                        <option value="0" ${order.order_status == 1 ? 'selected' : ''}>Pending</option>
-                                                                        <option value="1" ${order.order_status == 2 ? 'selected' : ''}>Rejected</option>
-                                                                        <option value="2" ${order.order_status == 3 ? 'selected' : ''}>Packaging</option>
-                                                                        <option value="3" ${order.order_status == 4 ? 'selected' : ''}>Shipping</option>
+                                                                        <option value="1" ${order.order_status == 1 ? 'selected' : ''}>Pending</option>
+                                                                        <option value="2" ${order.order_status == 2 ? 'selected' : ''}>Rejected</option>
+                                                                        <option value="3" ${order.order_status == 3 ? 'selected' : ''}>Packaging</option>
+                                                                        <option value="4" ${order.order_status == 4 ? 'selected' : ''}>Shipping</option>
                                                                         <option value="7" ${order.order_status == 7 ? 'selected' : ''}>Receive goods back</option>
                                                                     </select>
                                                                     <button type="submit" name="action" class="btn btn-sm btn-primary">
@@ -440,17 +438,18 @@
                                 </div>
                                 <div class="modal-body">
                                     <div class="actions">
-                                        Print | PDF | Email
+                                        <a href="createPDF?action=1&id=${orderId}" target="_blank">PDF</a>
+
                                     </div>
                                     <div class="card bg-light text-dark">
                                         <div class="card-body">
                                             <div class="container">
                                                 <div class="header">
                                                     <div class="store-info">
-                                                        <div class="store-title"><strong>Linh và đồng bọn Store</strong></div>
+                                                        <div class="store-title"><strong>Linh and Associates Store</strong></div>
                                                         <div class="contact-info">
-                                                            <div>Địa chỉ: Đại học Fpt HL</div>
-                                                            <div>Điện thoại: 123456789</div>
+                                                            <div>Address: FPT University HL</div>
+                                                            <div>Phone: 123456789</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -459,34 +458,49 @@
                                                     Orders
                                                 </div>
                                                 <div class="actions" style="text-align: center;">
-                                                    Ngày:  
+                                                    Date:  ${currentDate}
                                                 </div>
                                                 <div class="customer-info">
-                                                    <strong>THÔNG TIN KHÁCH HÀNG</strong><hr>
-                                                    <p>Tên khách hàng:  <!-- Replace with the actual customer name -->
-                                                        <br/>Điện thoại:  <!-- Replace with the actual customer phone -->
-                                                    </p>
+                                                    <strong>CUSTOMER INFORMATION</strong>
+                                                    <hr>
+                                                    <c:set var="found" value="false" scope="page" />
+
+                                                    <c:forEach items="${orders}" var="order">
+                                                        <c:if test="${found == false}">
+                                                            <c:if test="${order.id == orderId}">
+                                                                <c:set var="found" value="true" scope="page" />
+                                                                <c:forEach items="${customer}" var="c">
+                                                                    <c:if test="${order.customer_id == c.id}">
+                                                                        <p>Customer Name: ${c.firstname} ${c.lastname}
+                                                                            <br/>Phone: ${c.phone}
+                                                                        </p>
+                                                                    </c:if>
+                                                                </c:forEach>
+                                                            </c:if>
+                                                        </c:if>
+                                                    </c:forEach>
+
                                                 </div>
                                                 <div class="order-info">
-                                                    <strong>THÔNG TIN ĐƠN HÀNG</strong>
+                                                    <strong>ORDER INFORMATION</strong>
                                                     <hr>
-                                                    <p>Mã vận đơn: ${orderId}</p>
-                                                    <p>Danh sách sản phẩm</p>
+                                                    <p>Order ID: ${orderId}</p>
+                                                    <p>Product List</p>
                                                     <table class="table">
                                                         <thead>
                                                             <tr>
-                                                                <th style="width: 5%;">STT</th>
-                                                                <th style="width: 45%;">Tên hàng</th>
-                                                                <th style="width: 15%;">Đơn giá</th>
-                                                                <th style="width: 15%;">Số lượng</th>
-                                                                <th style="width: 30%;">Thành tiền</th>
+                                                                <th style="width: 5%;">No.</th>
+                                                                <th style="width: 45%;">Product Name</th>
+                                                                <th style="width: 15%;">Unit Price</th>
+                                                                <th style="width: 15%;">Quantity</th>
+                                                                <th style="width: 30%;">Total</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             <c:set var="totalPrice" value="0" />
-                                                            <c:forEach items="${orderdetail}" var="od">
+                                                            <c:forEach items="${orderdetail}" var="od" varStatus="loop">
                                                                 <tr>
-                                                                    <td>${od.id}</td>
+                                                                    <td>${loop.index + 1}</td>
                                                                     <td>
                                                                         <c:forEach items="${product}" var="product">
                                                                             <c:if test="${od.product_id == product.id}">
@@ -494,24 +508,25 @@
                                                                             </c:if>
                                                                         </c:forEach>
                                                                     </td>
-                                                                    <td>
+                                                                    <td class="text-end"><fmt:formatNumber value="${od.price}" type='number' groupingUsed='true'/></td>
+                                                                    <td class="text-end">
+                                                                        <c:set var="quantity" value="0" />
                                                                         <c:forEach items="${serial}" var="serial">
-                                                                            <c:if test="${serial.id==od.serial_number_id}">
-                                                                                ${ serial.sn}
+                                                                            <c:if test="${serial.id == od.serial_number_id}">
+                                                                                <c:set var="quantity" value="${quantity + 1}" />
                                                                             </c:if>
                                                                         </c:forEach>
+                                                                        ${quantity}
                                                                     </td>
-
-                                                                    <td></td>
-                                                                    <td>${od.price}</td>
-                                                                    <c:set var="totalPrice" value="${totalPrice + od.price}" />
-                                                                </c:forEach>
-                                                            </tr>
+                                                                    <td class="text-end"><fmt:formatNumber value="${od.price * quantity}" type='number' groupingUsed='true'/></td>
+                                                                    <c:set var="totalPrice" value="${totalPrice + (od.price * quantity)}" />
+                                                                </tr>
+                                                            </c:forEach>
                                                         </tbody>
                                                         <tfoot>
                                                             <tr>
-                                                                <td colspan="4">Tổng tiền</td>
-                                                                <td>total VNĐ</td>
+                                                                <td colspan="4">Total</td>
+                                                                <td class="text-end"><fmt:formatNumber value="${totalPrice}" type='number' groupingUsed='true'/> VNĐ</td>
                                                             </tr>
                                                         </tfoot>
                                                     </table>
@@ -521,7 +536,7 @@
 
                                         </div>
 
-                                    </div>
+                                    </div>z
                                 </div>
                             </div>
                             <!-- End content -->

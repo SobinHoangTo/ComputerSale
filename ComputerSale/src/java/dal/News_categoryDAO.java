@@ -119,6 +119,23 @@ public class News_categoryDAO extends DBContext {
         }
         return null;
     }
+    public News_category getByIdActive(int id) {
+        try {
+            String sql = "select * from news_category where id=? and status =1";
+            PreparedStatement pt = connection.prepareStatement(sql);
+            pt.setInt(1, id);
+            ResultSet rs = pt.executeQuery();
+            if (rs.next()) {
+                return getByRS(rs);
+            }
+            rs.close();
+            pt.close();
+        } catch (Exception a) {
+            System.out.println(a.getMessage());
+            return null;
+        }
+        return null;
+    }
 
     public static void main(String[] args) {
         System.out.println(new News_categoryDAO().getAll());

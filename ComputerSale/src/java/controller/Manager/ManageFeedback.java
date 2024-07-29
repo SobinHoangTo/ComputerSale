@@ -54,21 +54,22 @@ public class ManageFeedback extends HttpServlet {
 
         if (status) { //if the list is not null
             Map<Rate, Product> results = new HashMap<>();
-            Map<Integer, Customer> userList = new RateDAO().getCustomerRate();
             for (Map.Entry<Rate, Product> entry : list.entrySet()) {
                 Rate key = entry.getKey();
                 Product val = entry.getValue();
-                //search all 
+                //search product name
                 if (key.getFeedback().contains(searchQuery) || val.getName().contains(searchQuery)
                         || val.getCPU().contains(searchQuery) || val.getGPU().contains(searchQuery)
                         || val.getOS().contains(searchQuery)) {
                     results.put(key, val);
                 }
-                for (Map.Entry<Integer, Customer> entry1 : userList.entrySet()) {
-                    int id = entry1.getKey();
+                //search by rate id and customer object
+                for (Map.Entry<Integer, Customer> entry1 : new RateDAO().getCustomerRate().entrySet()) {
                     Customer cus = entry1.getValue();
                     if (cus.getUsername().contains(searchQuery)) {
-                        results.put(key, val);
+                        if (!results.containsKey(key)) {
+                            results.put(key, val);
+                        }
                     }
                 }
             }
@@ -78,6 +79,7 @@ public class ManageFeedback extends HttpServlet {
                 session.setAttribute("feedbackList", list);
                 MyUtils.setAlertAttributes(request, status, "find " + list.size() + " results.");
             } else {
+                session.removeAttribute("feedbackList");
                 MyUtils.setAlertAttributes(request, false, "found keyword '" + searchQuery + "'");
             }
         }
@@ -86,12 +88,17 @@ public class ManageFeedback extends HttpServlet {
         numberOfItems = list.size();
         int numberOfPages = (int) Math.ceil((double) numberOfItems / ItemsOfPage);
 
-        request.setAttribute("numberOfItems", numberOfItems);
-        request.setAttribute("numberOfPage", numberOfPages);
-        request.setAttribute("feedbackList", MyUtils.getMapByPaging(list, pageNumber, ItemsOfPage));
-        request.setAttribute("customerList", new RateDAO().getCustomerRate());
+        request.setAttribute(
+                "numberOfItems", numberOfItems);
+        request.setAttribute(
+                "numberOfPage", numberOfPages);
+        request.setAttribute(
+                "feedbackList", MyUtils.getMapByPaging(list, pageNumber, ItemsOfPage));
+        request.setAttribute(
+                "customerList", new RateDAO().getCustomerRate());
 
-        request.getRequestDispatcher("Views/Employ/Manager/ManageFeedback.jsp?search=" + searchQuery + "&pageNumber=" + pageNumber).forward(request, response);
+        request.getRequestDispatcher(
+                "Views/Employ/Manager/ManageFeedback.jsp?search=" + searchQuery + "&pageNumber=" + pageNumber).forward(request, response);
 
     }
 

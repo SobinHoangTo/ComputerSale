@@ -30,9 +30,9 @@ import util.MyUtils;
 public class SendEmail extends HttpServlet {
 
     private final String verifyHeader = "Confirm your email address with the code below";
-    private final String forgetPassHeader = "Enter the code below to reset your password";
+    private final String forgetPassHeader = "Here is your new password";
     private final String verifySubject = "Confirm email address";
-    private final String forgetPassSubject = "Reset password";
+    private final String forgetPassSubject = "New Password";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -51,15 +51,23 @@ public class SendEmail extends HttpServlet {
         switch (type) {
             case 1:
                 emailContent = readEmailTemplate("/Views/FormSendEmail.html");
-                String code = new MyUtils().genCode(6);
+                String code = MyUtils.genCode(6);
                 session = request.getSession();
-                session.setAttribute("code", new MyUtils().getMd5(code));
+                session.setAttribute("code", MyUtils.getMd5(code));
                 emailContent = emailContent.replace("{Code}", code);
                 emailContent = emailContent.replace("{Header}", verifyHeader);
+                emailContent = emailContent.replace("{Content}", "Code:");
                 message = new EmailUtility().sendMail(email, verifySubject, emailContent, true);
                 response.sendRedirect("Views/Account/ConfirmCode.jsp" + "?message=" + message);
                 return;
             case 2:
+                emailContent = readEmailTemplate("/Views/FormSendEmail.html");
+                String newPass = (String)request.getAttribute("newPass");
+                emailContent = emailContent.replace("{Code}", newPass);
+                emailContent = emailContent.replace("{Header}", forgetPassHeader);
+                emailContent = emailContent.replace("{Content}", "Your new password:");
+                message = new EmailUtility().sendMail(email, forgetPassSubject, emailContent, true);
+                response.sendRedirect("login" + "?message=" + message);
                 return;
             case 3:
                 Employee e = (Employee)session.getAttribute("currentEmployee");
@@ -106,10 +114,5 @@ public class SendEmail extends HttpServlet {
         }
         return content.toString();
     }
-
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
 
 }

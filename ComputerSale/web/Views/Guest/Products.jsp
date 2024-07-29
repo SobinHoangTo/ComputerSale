@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -9,18 +10,18 @@
         <title>Product List</title>
 
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mukta:300,400,700"> 
-        <link rel="stylesheet" href="fonts/icomoon/style.css">
+        <link rel="stylesheet" href="<%=request.getContextPath()%>fonts/icomoon/style.css">
 
-        <link rel="stylesheet" href="cssC/bootstrap.min.css">
-        <link rel="stylesheet" href="cssC/magnific-popup.css">
-        <link rel="stylesheet" href="cssC/jquery-ui.css">
-        <link rel="stylesheet" href="cssC/owl.carousel.min.css">
-        <link rel="stylesheet" href="cssC/owl.theme.default.min.css">
+        <link rel="stylesheet" href="<%=request.getContextPath()%>cssC/bootstrap.min.css">
+        <link rel="stylesheet" href="<%=request.getContextPath()%>cssC/magnific-popup.css">
+        <link rel="stylesheet" href="<%=request.getContextPath()%>cssC/jquery-ui.css">
+        <link rel="stylesheet" href="<%=request.getContextPath()%>cssC/owl.carousel.min.css">
+        <link rel="stylesheet" href="<%=request.getContextPath()%>cssC/owl.theme.default.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css">
 
-        <link rel="stylesheet" href="cssC/aos.css">
+        <link rel="stylesheet" href="<%=request.getContextPath()%>cssC/aos.css">
 
-        <link rel="stylesheet" href="cssC/style.css">
+        <link rel="stylesheet" href="<%=request.getContextPath()%>cssC/style.css">
     </head>
     <body>
 
@@ -60,13 +61,13 @@
                                 <div class="mb-4">
                                     <h3 class="mb-3 h6 text-uppercase text-black d-block">Filter by Price</h3>
                                     <label for="priceRange" class="form-label">Price range</label>
-                                    <input type="range" onchange="onChangePrice()" class="border-primary ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content" min="0" max="6000" step="1000" name="price" id="priceRange" value="${sessionScope.priceFilter!=null?sessionScope.priceFilter:0}">
-                                    <input type="text" class="form-control border-0 pl-0 bg-white" value="$${sessionScope.priceFilter!=null?sessionScope.priceFilter:0}" id="price" disabled>
+                                    <input type="range" onchange="onChangePrice()" class="border-primary ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content" min="0" max="150000000" step="10000000" name="price" id="priceRange" value="${sessionScope.priceFilter!=null?sessionScope.priceFilter:0}">
+                                    <input type="text" class="form-control border-0 pl-0 bg-white" value="<fmt:formatNumber value='${sessionScope.priceFilter!=null?sessionScope.priceFilter:0}' type='number' groupingUsed='true'/> VND" id="price" disabled>
                                 </div>
 
                                 <div class="mb-4">
                                     <h3 class="mb-3 h6 text-uppercase text-black d-block">Brand</h3>
-                                    <c:forEach var="i" items="${requestScope.bList}">
+                                    <c:forEach var="i" items="${sessionScope.listBrand!=null?sessionScope.listBrand:bList}">
                                         <label for="${i.getId()}" class="d-flex">
                                             <input type="checkbox" name="brand" value="${i.getId()}" id="${i.getId()}" class="mr-2 mt-1" 
                                                    <c:forEach var="j" items="${sessionScope.brandFilter}">
@@ -82,7 +83,6 @@
 
                     </div>
 
-                    <%@include file="ProductsPage/Related.jsp" %>
 
                 </div>
             </div>
@@ -101,10 +101,11 @@
 
         <script src="js/main.js"></script>
         <script>
-                                        function onChangePrice() {
-                                            var value = document.getElementById('priceRange').value;
-                                            document.getElementById('price').value = '$' + value;
-                                        }
+            function onChangePrice() {
+                var value = document.getElementById('priceRange').value;
+                var formattedValue = new Intl.NumberFormat('en-US').format(value); // Format number with commas
+                document.getElementById('price').value =  formattedValue + ' VND';
+            }
         </script>
     </body>
 </html>

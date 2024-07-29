@@ -29,8 +29,8 @@ public class addEmployee extends HttpServlet {
 
         EmployeeDAO employeeDAO = new EmployeeDAO();
 
-        if (employeeDAO.checkSignUp(username, email)) {
-            Employee newEmployee = new Employee(0, username, password, email, phone, address, "", "", dob, 3);
+        if (employeeDAO.checkSignUp(username, email)) {//default role account ==3, staff
+            Employee newEmployee = new Employee(0, username, password, email, phone, address, "", "", "", email, 3, 1);
             boolean status = employeeDAO.addEmployee(newEmployee);
             request.setAttribute("alertMessage", status ? "Added successfully." : "An error occurred while adding the employee.");
             request.setAttribute("alertType", status ? "success" : "danger");

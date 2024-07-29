@@ -81,11 +81,11 @@
                                         <div class="container col-md-4 mb-3" style="width: 25%;">
                                             <form class="d-flex" id="formRole" role="search" action="manageaccount" method="get">
                                                 <div class="input-group">
-                                                    <select id="role" name="role" onchange="document.getElementById('formRole').submit()" class="form-select me-2">
-                                                        <option value="0" ${(param.role==null||param.role==0)?"selected":""}>All Role</option>
-                                                        <option value="1" ${param.role==1?"selected":""}>Admin</option>
-                                                        <option value="2" ${param.role==2?"selected":""}>Manager</option>
-                                                        <option value="3" ${param.role==3?"selected":""}>Staff</option>
+                                                    <select id="role" name="roleSearch" onchange="document.getElementById('formRole').submit()" class="form-select me-2">
+                                                        <option value="0" ${(param.roleSearch==null||param.roleSearch==0)?"selected":""}>All Role</option>
+                                                        <option value="1" ${param.roleSearch==1?"selected":""}>Admin</option>
+                                                        <option value="2" ${param.roleSearch==2?"selected":""}>Manager</option>
+                                                        <option value="3" ${param.roleSearch==3?"selected":""}>Staff</option>
                                                         <!-- Add other role options here -->
                                                     </select>
                                                 </div>
@@ -94,60 +94,12 @@
 
                                         <!-- Add Employees button -->
                                         <div class="container col-md-3 mb-3" style="width: 25%;">
-                                            <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#addForm" type="button">
+                                            <a href="addemployee" class="btn btn-outline-primary w-100">
                                                 Add Employees
-                                            </button>
+                                            </a>
                                         </div>
                                     </div>
                                     <!-- End Search -->
-                                    <!-- Add Employee Modal -->
-                                    <div class="modal fade" id="addForm" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addFormLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content bg-secondary">
-                                                <div class="modal-header">
-                                                    <h1 class="modal-title fs-5" id="addFormLabel">Add Employee</h1>
-                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <form action="addemployee" method="post">
-                                                    <div class="modal-body">
-                                                        <div class="card bg-secondary">
-                                                            <!-- Username -->
-                                                            <div class="mb-3">
-                                                                <label for="addusername" class="form-label">Username</label>
-                                                                <input type="text" class="form-control" id="addusername" name="addusername" required>
-                                                            </div>
-                                                            <!-- Email -->
-                                                            <div class="mb-3">
-                                                                <label for="addemail" class="form-label">Email address</label>
-                                                                <input type="email" class="form-control" id="addemail" name="addemail" required>
-                                                            </div>
-                                                            <!-- Phone Number -->
-                                                            <div class="mb-3">
-                                                                <label for="addphone" class="form-label">Phone Number</label>
-                                                                <input type="tel" class="form-control" id="addphone" name="addphone" required>
-                                                            </div>
-                                                            <!-- Address -->
-                                                            <div class="mb-3">
-                                                                <label for="addaddress" class="form-label">Address</label>
-                                                                <input type="text" class="form-control" id="addaddress" name="addaddress" required>
-                                                            </div>
-                                                            <!-- Date of Birth -->
-                                                            <div class="mb-3">
-                                                                <label for="adddob" class="form-label">Date of Birth</label>
-                                                                <input type="date" class="form-control" id="adddob" name="adddob" required>
-                                                            </div>
-                                                            <!-- Hidden Field for Page -->
-                                                            <input type="hidden" name="page" id="addrole" value="manageacc">
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="submit" class="btn btn-primary">Submit</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- End Add Employee Modal -->
                                 </div>
 
                                 <div class="bg-light rounded h-100 p-4">
@@ -158,123 +110,179 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                             </div>
                                         </c:if>
-                                        <table class="table">
+                                        <table class="table table-striped">
                                             <thead>
                                                 <tr>
                                                     <th scope="col">ID</th>
                                                     <th scope="col">Username</th>
                                                     <th scope="col">Email</th>
                                                     <th scope="col">Phone Number</th>
-                                                    <th scope="col">Role</th>
-                                                    <th scope="col">Action</th>
+                                                    <th scope="col" style="text-align: center;">Role</th>
+                                                    <th scope="col" style="text-align: center;">Status</th>
+                                                    <th scope="col" style="text-align: center;">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-
                                                 <c:if test="${empty eList}">
                                                     <tr>
-                                                        <td colspan="6" class="text-center">No data available</td>
+                                                        <td colspan="7" class="text-center">No data available</td>
                                                     </tr>
                                                 </c:if>
                                                 <c:forEach items="${eList}" var="e">
-                                                    <tr data-id="${e.id}" data-username="${e.username}" 
-                                                        data-email="${e.email}" data-phone="${e.phone}"
-                                                        data-role="${e.role_id}">
+                                                    <tr data-id="${e.id}" data-username="${e.username}" data-email="${e.email}" data-phone="${e.phone}" data-role="${e.role_id}">
                                                         <td>${e.id}</td>
                                                         <td>${e.username}</td>
                                                         <td>${e.email}</td>
-                                                        <td>${e.phone}</td>
-                                                        <td>
+                                                        <td style="text-align: right;">${e.phone}</td>
+                                                        <td style="text-align: center;">
                                                             <c:choose>
-                                                                <c:when test="${e.role_id == 1}">Admin</c:when>
-                                                                <c:when test="${e.role_id == 2}">Manager</c:when>
-                                                                <c:when test="${e.role_id == 3}">Staff</c:when>
-                                                                <c:otherwise>Unknown</c:otherwise>
+                                                                <c:when test="${e.role_id != 1}">
+                                                                    <form action="manageaccount" method="post" style="display: inline;">
+                                                                        <input type="hidden" name="id" value="${e.id}" />
+                                                                        <input type="hidden" name="action" value="updateRole" />
+                                                                        <div class="input-group">
+                                                                            <select class="form-select form-select-sm" id="status" name="role">
+                                                                                <option value="2" ${e.role_id == 2 ? 'selected' : ''}>Manager</option>
+                                                                                <option value="3" ${e.role_id == 3 ? 'selected' : ''}>Staff</option>
+                                                                            </select>
+                                                                            <button type="submit" name="action" class="btn btn-sm btn-primary">
+                                                                                <i class="bi bi-arrow-repeat"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                    </form>
+                                                                </c:when>
+                                                                <c:otherwise>Admin</c:otherwise>
                                                             </c:choose>
                                                         </td>
-                                                        <td>
+                                                        <td style="text-align: center;">
+                                                            <c:if test="${e.status == 1}">
+                                                                <!-- Active Button -->
+                                                                <form action="manageaccount" method="POST">
+                                                                    <input type="hidden" id="id" name="id" value="${e.id}">
+                                                                    <button type="submit" class="btn btn-outline-success btn-sm" title="Active" name="action" value="inactive">
+                                                                        <i class="bi bi-toggle-on"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </c:if>
+                                                            <c:if test="${e.status == 0}">
+                                                                <!-- Inactive Button -->
+                                                                <form action="manageaccount" method="POST">
+                                                                    <input type="hidden" id="id" name="id" value="${e.id}">
+                                                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Inactive" name="action" value="active">
+                                                                        <i class="bi bi-toggle-off"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </c:if>
+                                                        </td>
+                                                        <td style="text-align: center;">
                                                             <c:if test="${e.role_id != 1}">
-                                                                <button type="button" class="btn btn-light edit-button" 
-                                                                        style="border-radius: 8px;" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
-                                                                        data-role="${e.role_id}">
+                                                                <!-- Button to trigger the modal -->
+                                                                <button type="button" class="btn btn-sm btn-light edit-button" style="border-radius: 8px;" data-bs-toggle="modal" data-bs-target="#staticBackdrop-${e.id}" data-role="${e.role_id}" data-id="${e.id}" data-username="${e.username}" data-email="${e.email}" data-phone="${e.phone}" data-firstname="${e.firstname}" data-lastname="${e.lastname}" data-address="${e.address}" data-img="${e.img}" data-regdate="${e.reg_date}" data-status="${e.status}">
                                                                     <i class="bi bi-pencil-square"></i>
                                                                 </button>
+                                                                <!-- Modal for each employee -->
+                                                                <div class="modal fade" id="staticBackdrop-${e.id}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel-${e.id}" aria-hidden="true">
+                                                                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                                                        <div class="modal-content bg-light">
+                                                                            <div class="modal-header">
+                                                                                <h1 class="modal-title fs-5" id="staticBackdropLabel-${e.id}">View Employee Role</h1>
+                                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                            </div>
+                                                                            <div class="modal-body bg-light">
+                                                                                <div class="card bg-light">
+                                                                                    <table class="table table-borderless">
+                                                                                        <tbody>
+                                                                                            <tr>
+                                                                                                <td style="width: 30%;"><strong>ID:</strong></td>
+                                                                                                <td><input type="text" id="id-${e.id}" name="id" class="form-control" value="${e.id}" disabled></td>
+                                                                                            </tr>
+                                                                                            <tr>
+                                                                                                <td><strong>Username:</strong></td>
+                                                                                                <td><input type="text" id="username-${e.id}" class="form-control" value="${e.username}" disabled></td>
+                                                                                            </tr>
+                                                                                            <tr>
+                                                                                                <td><strong>Email:</strong></td>
+                                                                                                <td><input type="email" id="email-${e.id}" class="form-control" value="${e.email}" disabled></td>
+                                                                                            </tr>
+                                                                                            <tr>
+                                                                                                <td><strong>Phone Number:</strong></td>
+                                                                                                <td><input type="tel" id="phoneNumber-${e.id}" class="form-control" value="${e.phone}" disabled></td>
+                                                                                            </tr>
+                                                                                            <tr>
+                                                                                                <td><strong>Address:</strong></td>
+                                                                                                <td><input type="text" id="address-${e.id}" class="form-control" value="${e.address}" disabled></td>
+                                                                                            </tr>
+                                                                                            <tr>
+                                                                                                <td><strong>First Name:</strong></td>
+                                                                                                <td><input type="text" id="firstname-${e.id}" class="form-control" value="${e.firstname}" disabled></td>
+                                                                                            </tr>
+                                                                                            <tr>
+                                                                                                <td><strong>Last Name:</strong></td>
+                                                                                                <td><input type="text" id="lastname-${e.id}" class="form-control" value="${e.lastname}" disabled></td>
+                                                                                            </tr>
+                                                                                            <tr>
+                                                                                                <td><strong>Image:</strong></td>
+                                                                                                <td><input type="text" id="img-${e.id}" class="form-control" value="${e.img}" disabled></td>
+                                                                                            </tr>
+                                                                                            <tr>
+                                                                                                <td><strong>Registration Date:</strong></td>
+                                                                                                <td><input type="text" id="regDate-${e.id}" class="form-control" value="${e.reg_date}" disabled></td>
+                                                                                            </tr>
+                                                                                            <tr>
+                                                                                                <td><strong>Status:</strong></td>
+                                                                                                <td>
+                                                                                                    <div class="form-check form-check-inline">
+                                                                                                        <input class="form-check-input" type="radio" name="status-${e.id}" id="statusActive-${e.id}" value="1" <c:if test="${e.status == 1}">checked</c:if> disabled>
+                                                                                                        <label class="form-check-label" for="statusActive-${e.id}">Active</label>
+                                                                                                    </div>
+                                                                                                    <div class="form-check form-check-inline">
+                                                                                                        <input class="form-check-input" type="radio" name="status-${e.id}" id="statusInactive-${e.id}" value="0" <c:if test="${e.status == 0}">checked</c:if> disabled>
+                                                                                                        <label class="form-check-label" for="statusInactive-${e.id}">Inactive</label>
+                                                                                                    </div>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                            <tr>
+                                                                                                <td><strong>Role:</strong></td>
+                                                                                                <td>
+                                                                                                    <c:choose>
+                                                                                                        <c:when test="${e.role_id == 2}">Manager</c:when>
+                                                                                                        <c:when test="${e.role_id == 3}">Staff</c:when>
+                                                                                                    </c:choose>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                            <!-- Add more rows for additional fields as needed -->
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             </c:if>
                                                         </td>
                                                     </tr>
                                                 </c:forEach>
-                                            </tbody> 
+                                            </tbody>
                                         </table>
                                     </div>
                                     <!--pagination-->
                                     <nav aria-label="Page navigation">
                                         <ul class="pagination justify-content-end">
-                                            <li class="page-item"><a class="page-link" href="<%=request.getContextPath()%>/manageaccount?pageNumber=1">Previous</a></li>
-                                                <c:if test="${param.pageNumber==1}">
-                                                <li class="page-item disabled">
-                                                    <a class="page-link" href="<%=request.getContextPath()%>/manageaccount?pageNumber=${(param.pageNumber-1)<1?requestScope.numberOfPage:(param.pageNumber-1)}" aria-label="Previous">
-                                                        <span aria-hidden="true">&laquo;</span>
-                                                        <span class="sr-only">Previous</span>
-                                                    </a>
-                                                </li>
-                                            </c:if>
-                                            <c:if test="${requestScope.numberOfPage<=5}">
-                                                <c:forEach begin="1" end="${requestScope.numberOfPage}" var="i">
-                                                    <li class="page-item ${i==param.pageNumber?"active":""}">
-                                                        <a class="page-link" href="<%=request.getContextPath()%>/manageaccount?pageNumber=${i}">${i}</a>
-                                                    </li>
-                                                </c:forEach>
-                                            </c:if>
-                                            <c:if test="${requestScope.numberOfPage>5}">
-                                                <c:choose>
-                                                    <c:when test="${param.pageNumber-3<=0}">
-                                                        <c:forEach begin="1" end="5" var="i">
-                                                            <li class="page-item ${i==param.pageNumber?"active":""}">
-                                                                <a class="page-link" href="<%=request.getContextPath()%>/manageaccount?pageNumber=${i}">${i}</a>
-                                                            </li>
-                                                        </c:forEach>
-                                                        <li>
-                                                            <a class="page-link" href="#">...</a>
-                                                        </li>
-                                                    </c:when>
-                                                    <c:when test="${param.pageNumber+2>=requestScope.numberOfPage}">
-                                                        <li>
-                                                            <a class="page-link" href="#">...</a>
-                                                        </li>
-                                                        <c:forEach begin="${requestScope.numberOfPage-4}" end="${requestScope.numberOfPage}" var="i">
-                                                            <li class=" ${i==param.pageNumber?"active":""}">
-                                                                <a class="page-link" href="<%=request.getContextPath()%>/manageaccount?pageNumber=${i}">${i}</a>
-                                                            </li>
-                                                        </c:forEach>
-
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <li>
-                                                            <a class="page-link" href="#">...</a>
-                                                        </li>
-                                                        <c:forEach begin="${param.pageNumber-2}" end="${param.pageNumber+2}" var="i">
-                                                            <li class="page-item ${i==param.pageNumber?"active":""}">
-                                                                <a class="page-link" href="<%=request.getContextPath()%>/manageaccount?pageNumber=${i}">${i}</a>
-                                                            </li>
-                                                        </c:forEach>
-                                                        <li>
-                                                            <a class="page-link" href="#">...</a>
-                                                        </li>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </c:if>
                                             <li class="page-item">
-                                                <a class="page-link"
-                                                   href="<%=request.getContextPath()%>/manageaccount?pageNumber=${(param.pageNumber+1)>requestScope.numberOfPage?1:(param.pageNumber+1)}"
-                                                   aria-label="Next">
-                                                    <span aria-hidden="true">&raquo;</span>
-                                                    <span class="sr-only">Next</span>
-                                                </a>
+                                                <a class="page-link" href="<%=request.getContextPath()%>/manageaccount?pageNumber=1">Previous</a>
                                             </li>
-                                            <li class="page-item"><a class="page-link" href="<%=request.getContextPath()%>/manageaccount?pageNumber=${numberOfPage}">End</a></li>
+                                            <c:forEach begin="1" end="${requestScope.numberOfPage}" var="i">
+                                                <li class="page-item ${i == param.pageNumber ? 'active' : ''}">
+                                                    <a class="page-link" href="<%=request.getContextPath()%>/manageaccount?pageNumber=${i}">${i}</a>
+                                                </li>
+                                            </c:forEach>
+                                            <li class="page-item">
+                                                <a class="page-link" href="<%=request.getContextPath()%>/manageaccount?pageNumber=${numberOfPage}">Next</a>
+                                            </li>
                                         </ul>
                                     </nav>
                                 </div>
+
 
                             </div>
                             <!-- End Content -->
@@ -283,59 +291,6 @@
                 </div>
                 <!-- Blank End -->
                 <!-- Modal -->
-                <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content bg-light">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="staticBackdropLabel">Change Employee Role</h1>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <form action="manageaccount" method="post">
-                                <div class="modal-body bg-light">
-                                    <div class="card bg-light">
-                                        <table class="table table-borderless">
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <input type="hidden" id="id" name="id" class="form-control">
-                                                        <input type="text" id="id-display" class="form-control" disabled>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <input type="text" id="username" class="form-control" disabled>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <input type="email" id="email" class="form-control" disabled>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <input type="tel" id="phoneNumber" class="form-control" disabled>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <select class="form-select" aria-label="Default select example" id="role" name="role">
-                                                            <option value="3">Staff</option>
-                                                            <option value="2">Manager</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="submit" class="btn btn-primary" id="changeRoleButton">Change</button>
-                                </div>
-                            </form>
-
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Footer Start -->
                 <%@include file="../HeadFoot/EmployeeFooter.jsp" %>
@@ -364,32 +319,7 @@
         <script src="js/main.js"></script>
 
 
-        <!-- Send data to the modal -->
-        <script>
-                                                        document.addEventListener("DOMContentLoaded", function () {
-                                                            var editButtons = document.querySelectorAll(".edit-button");
 
-                                                            editButtons.forEach(function (button) {
-                                                                button.addEventListener("click", function () {
-                                                                    var tr = button.closest("tr");
-                                                                    var id = tr.getAttribute("data-id");
-                                                                    var username = tr.getAttribute("data-username");
-                                                                    var email = tr.getAttribute("data-email");
-                                                                    var phone = tr.getAttribute("data-phone");
-                                                                    var role = tr.getAttribute("data-role");
 
-                                                                    document.getElementById("id").value = id;
-                                                                    document.getElementById("id-display").value = id;
-                                                                    document.getElementById("username").value = username;
-                                                                    document.getElementById("email").value = email;
-                                                                    document.getElementById("phoneNumber").value = phone;
-
-                                                                    // Set the selected option based on the role value
-                                                                    var selectRole = document.getElementById("role");
-                                                                    selectRole.value = role;
-                                                                });
-                                                            });
-                                                        });
-        </script>
     </body>
 </html>

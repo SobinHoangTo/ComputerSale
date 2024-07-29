@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -21,22 +22,27 @@
                     <div class="bg-white rounded p-4 p-sm-5 my-4 mx-3">
                         <div class="d-flex align-items-center justify-content-center mb-3">
                             <a href="<%=request.getContextPath()%>/home" >
-                                <img title="Back to Home" src="../../Image/laptop-icon.png" alt="Logo" class="img-fluid rounded" style="max-height: 100px;">
+                                <img title="Back to Home" src="<%=request.getContextPath()%>/Image/laptop-icon.png" alt="Logo" class="img-fluid rounded" style="max-height: 100px;">
                             </a>
-                            <h3>Forgot Password</h3>
+                            <h3>Confirm code</h3>
                         </div>
-                        <form action="forgotpass">
-
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" id="email" placeholder="Email" required>
-                                <label for="email">Email</label>
-                                <div class="text-end">
-                                    <a href="#">Send code</a>
+                        <c:if test="${param.message!=null}">
+                            <div class="form-group">
+                                <div class="alert alert-warning" role="alert">
+                                    ${param.message}
                                 </div>
                             </div>
-
+                        </c:if>
+                            <c:if test="${requestScope.message!=null}">
+                            <div class="form-group">
+                                <div class="alert alert-warning" role="alert">
+                                    ${requestScope.message}
+                                </div>
+                            </div>
+                        </c:if>
+                        <form action="<%=request.getContextPath()%>/verifycode" method="post">
                             <div class="form-floating mb-4">
-                                <input type="number" class="form-control" id="confirmcode" placeholder="Confirmation code" required>
+                                <input type="text" name="code" class="form-control" id="confirmcode" placeholder="Confirmation code" required>
                                 <label for="confirmcode">Confirm code</label>
                             </div>
 

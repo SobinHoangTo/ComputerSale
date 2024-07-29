@@ -14,19 +14,107 @@
     </filter>
     <filter>
         <filter-name>StaffFilter</filter-name>
-        <filter-class>filter.employee.AuthenticateStaff</filter-class>
+        <filter-class>filter.employee.FilterStaff</filter-class>
     </filter>
+    <filter-mapping>
+        <filter-name>CustomerFilter</filter-name>
+        <servlet-name>ShoppingHistory</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>CustomerFilter</filter-name>
+        <servlet-name>Payment</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>CustomerFilter</filter-name>
+        <servlet-name>Profile</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>CustomerFilter</filter-name>
+        <servlet-name>Order</servlet-name>
+    </filter-mapping>
     <filter-mapping>
         <filter-name>CustomerFilter</filter-name>
         <servlet-name>Checkout</servlet-name>
     </filter-mapping>
     <filter-mapping>
-        <filter-name>CustomerFilter</filter-name>
-        <servlet-name>Carts</servlet-name>
+        <filter-name>AdminFilter</filter-name>
+        <servlet-name>ManageAccount</servlet-name>
     </filter-mapping>
     <filter-mapping>
         <filter-name>AdminFilter</filter-name>
-        <servlet-name>ManageAccount</servlet-name>
+        <servlet-name>Viewstatictic</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>ManagerFilter</filter-name>
+        <servlet-name>ManageFeedback</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>ManagerFilter</filter-name>
+        <servlet-name>addEmployee</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>StaffFilter</filter-name>
+        <servlet-name>EmployeeProfile</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>StaffFilter</filter-name>
+        <servlet-name>EditStoreInfo</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>StaffFilter</filter-name>
+        <servlet-name>ManageSerialNumber</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>StaffFilter</filter-name>
+        <servlet-name>ManageNewsCategory</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>StaffFilter</filter-name>
+        <servlet-name>AddDiscount</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>StaffFilter</filter-name>
+        <servlet-name>AddNews</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>StaffFilter</filter-name>
+        <servlet-name>ManageCategory</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>StaffFilter</filter-name>
+        <servlet-name>ManageOrders</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>StaffFilter</filter-name>
+        <servlet-name>UpdateWarranty</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>StaffFilter</filter-name>
+        <servlet-name>EmployeeDashboard</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>StaffFilter</filter-name>
+        <servlet-name>ManageBrand</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>StaffFilter</filter-name>
+        <servlet-name>ManageProducts</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>StaffFilter</filter-name>
+        <servlet-name>ManageDiscount</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>StaffFilter</filter-name>
+        <servlet-name>ManageWarranty</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>StaffFilter</filter-name>
+        <servlet-name>ManageNews</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>StaffFilter</filter-name>
+        <servlet-name>ManageCompanyInfor</servlet-name>
     </filter-mapping>
     <servlet>
         <servlet-name>Home</servlet-name>
@@ -59,10 +147,6 @@
     <servlet>
         <servlet-name>ViewWanrranty</servlet-name>
         <servlet-class>controller.Manager.ViewWanrranty</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ProductDetails</servlet-name>
-        <servlet-class>controller.Guest.ProductDetails</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ManageNews</servlet-name>
@@ -188,6 +272,26 @@
         <servlet-name>ManageNewsCategory</servlet-name>
         <servlet-class>controller.Staff.ManageNewsCategory</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ForgetPassword</servlet-name>
+        <servlet-class>controller.Account.ForgetPassword</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ManageSerialNumber</servlet-name>
+        <servlet-class>controller.Staff.ManageSerialNumber</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ProductDetails</servlet-name>
+        <servlet-class>controller.Guest.ProductDetails</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>EmployeeProfile</servlet-name>
+        <servlet-class>controller.Staff.EmployeeProfile</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>EditStoreInfo</servlet-name>
+        <servlet-class>controller.Staff.EditStoreInfo</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Home</servlet-name>
         <url-pattern>/home</url-pattern>
@@ -211,10 +315,6 @@
     <servlet-mapping>
         <servlet-name>ManageCompanyInfor</servlet-name>
         <url-pattern>/managecompanyinfor</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ProductDetails</servlet-name>
-        <url-pattern>/productdetails</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ManagerDashboard</servlet-name>
@@ -347,6 +447,27 @@
     <servlet-mapping>
         <servlet-name>ManageNewsCategory</servlet-name>
         <url-pattern>/managenewscategory</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProductDetails</servlet-name>
+        <url-pattern>/productdetails/*</url-pattern>
+        <url-pattern>/productdetails</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ForgetPassword</servlet-name>
+        <url-pattern>/forgetpassword</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ManageSerialNumber</servlet-name>
+        <url-pattern>/manageserialnumber</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EmployeeProfile</servlet-name>
+        <url-pattern>/employeeprofile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditStoreInfo</servlet-name>
+        <url-pattern>/editstoreinfo</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>home</welcome-file>

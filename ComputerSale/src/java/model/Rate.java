@@ -13,15 +13,17 @@ public class Rate {
     private int order_detail_id;
     private int star_rate;
     private String feedback;
+    private int status;
 
     public Rate() {
     }
 
-    public Rate(int id, int order_detail_id, int star_rate, String feedback) {
+    public Rate(int id, int order_detail_id, int star_rate, String feedback, int status) {
         this.id = id;
         this.order_detail_id = order_detail_id;
         this.star_rate = star_rate;
         this.feedback = feedback;
+        this.status = status;
     }
 
     public int getId() {
@@ -56,11 +58,19 @@ public class Rate {
         this.feedback = feedback;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
-        return "Rate{" + "id=" + id + ", order_detail_id=" + order_detail_id + ", star_rate=" + star_rate + ", feedback=" + feedback + '}';
+        return "Rate{" + "id=" + id + ", order_detail_id=" + order_detail_id + ", star_rate=" + star_rate + ", feedback=" + feedback + ", status=" + status + '}';
     }
+
     
-    
-    
+
 }

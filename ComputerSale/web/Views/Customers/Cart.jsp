@@ -90,7 +90,7 @@
                                                         <td class="product-name">
                                                             <h2 class="h5 text-black">${i.getValue().getProduct().getName()}</h2>
                                                         </td>
-                                                        <td>$${i.getValue().getProduct().getPrice()}</td>
+                                                        <td>${i.getValue().getProduct().getPrice()}VNĐ</td>
                                                         <td>
                                                             <div class="input-group mb-3" style="max-width: 120px;">
                                                                 <div class="input-group-prepend">
@@ -103,7 +103,7 @@
                                                             </div>
                                                         </td>
                                                         <td id="totalItemPrice${i.getValue().getProduct().getId()}">
-                                                            ${i.getValue().getProduct().getPrice() * i.getValue().getQuantity()}
+                                                            ${i.getValue().getProduct().getPrice() * i.getValue().getQuantity()}VNĐ
                                                         </td>
                                                         <td>
                                                             <a href="#" onclick="deleteItem(${i.getValue().getProduct().getId()})" class="btn btn-primary btn-sm">X</a>
@@ -143,7 +143,7 @@
                                             <span class="text-black">Total</span>
                                         </div>
                                         <div class="col-md-6 text-right">
-                                            <strong class="text-black" id="totalPrice">$0</strong>
+                                            <strong class="text-black" id="totalPrice">0VNĐ</strong>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -219,7 +219,7 @@
                                                                             totalPrice += parseInt(document.getElementById('totalItemPrice' + elements[i].value).innerHTML);
                                                                         }
                                                                     }
-                                                                    document.getElementById('totalPrice').innerHTML = "$" + totalPrice;
+                                                                    document.getElementById('totalPrice').innerHTML = totalPrice + "VNĐ";
                                                                 }
                                                                 function checkboxAll() {
                                                                     var checkAll = document.getElementById('checkAll').checked;

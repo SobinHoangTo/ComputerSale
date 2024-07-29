@@ -6,16 +6,17 @@ package util;
 
 import model.*;
 import jakarta.servlet.http.HttpServletRequest;
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
 
 /**
  *
@@ -23,7 +24,7 @@ import java.util.Random;
  */
 public class MyUtils {
 
-    public String genCode(int length) {
+    public static String genCode(int length) {
         Random rd = new Random();
         StringBuilder code = new StringBuilder();
         for (int i = 0; i < length; i++) {
@@ -40,20 +41,7 @@ public class MyUtils {
         return code.toString();
     }
 
-    public String getRole(Employee temp) {
-        return switch (temp.getRole_id()) {
-            case 1 ->
-                "Staff";
-            case 2 ->
-                "Manager";
-            case 3 ->
-                "Admin";
-            default ->
-                null;
-        };
-    }
-
-    public String getMd5(String input) {
+    public static String getMd5(String input) {
         try {
 
             // Static getInstance method is called with hashing MD5
@@ -78,8 +66,8 @@ public class MyUtils {
         }
     }
 
-    public static <T> List<T> getArrayListByPaging(ArrayList<T> pList, int pageNumber, int ItemsOfPage) {
-        return pList.subList((pageNumber - 1) * ItemsOfPage, ((pageNumber * ItemsOfPage) > pList.size()) ? pList.size() : (pageNumber * ItemsOfPage));
+    public static <T> List<T> getArrayListByPaging(ArrayList<T> list, int pageNumber, int ItemsOfPage) {
+        return list.subList((pageNumber - 1) * ItemsOfPage, ((pageNumber * ItemsOfPage) > list.size()) ? list.size() : (pageNumber * ItemsOfPage));
     }
 
     public static <K, V> Map<K, V> getMapByPaging(Map<K, V> pMap, int pageNumber, int itemsPerPage) {
@@ -154,6 +142,17 @@ public class MyUtils {
                 throw new IllegalArgumentException("All parameters are required.");
             }
         }
+    }
+
+    public static String[] convertKeywords(String keywordString) {
+        return keywordString.split("\\s+");
+    }
+  public static boolean containsKeywords(String text, String[] keywords) {
+        return Arrays.stream(keywords).anyMatch(text.toLowerCase()::contains);
+    }
+
+    public static String toSEOUrl(String productName) {
+        return productName != null ? productName.toLowerCase().replaceAll("\\s", "-") : null;
     }
 
     public static void main(String[] args) {

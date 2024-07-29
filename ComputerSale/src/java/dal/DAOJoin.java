@@ -43,7 +43,8 @@ public class DAOJoin extends DBContext {
         }
         return list;
     }
-    public int getNumberOfProductsSoldByCategory(int id){
+
+    public int getNumberOfProductsSoldByCategory(int id) {
         try {
             String sql = """
                         select p.category_id, count(od.id) as NumberOfProductSole from [order] o join
@@ -65,11 +66,12 @@ public class DAOJoin extends DBContext {
         }
         return 0;
     }
-    public ArrayList<ArrayList<String>> getOrderAdminStatistic(){
+
+    public ArrayList<ArrayList<String>> getOrderAdminStatistic() {
         ArrayList<ArrayList<String>> list = new ArrayList<>();
         try {
             String sql = """
-                        select o.order_date, o.id, c.firstname+' '+c.lastname as fullname, sum(od.price) as total, o.paid_date from [order] o join
+                        select TOP 5 o.order_date, o.id, c.firstname+' '+c.lastname as fullname, sum(od.price) as total, o.paid_date from [order] o join
                         order_detail od on o.id=od.order_id join
                         customer c on o.customer_id=c.id
                         group by o.id, o.order_date, c.firstname, c.lastname, o.paid_date
@@ -93,7 +95,8 @@ public class DAOJoin extends DBContext {
         }
         return list;
     }
-    public int getNumberProductSoldByDay(String day){
+
+    public int getNumberProductSoldByDay(String day) {
         try {
             String sql = """
                         select o.order_date , COUNT(od.id) as NumberSold from [order] o join
@@ -113,7 +116,8 @@ public class DAOJoin extends DBContext {
         }
         return 0;
     }
-    public int getTotalNumberProductSold(){
+
+    public int getTotalNumberProductSold() {
         try {
             String sql = """
                         select COUNT(od.id) as NumberSold from [order] o join
@@ -131,24 +135,49 @@ public class DAOJoin extends DBContext {
         }
         return 0;
     }
-    public ArrayList<ArrayList<String>> getProductQuality(int type){
+    public ArrayList<ArrayList<String>> getProductRate(){
         ArrayList<ArrayList<String>> list = new ArrayList<>();
-        try{
+        try {
             String sql = """
-                        select Top 5 p.id, p.name,
-                        	count(wr.id) as NumberOfWarranty, 
-                        	count(od.id) as TotalUnitsSold, 
-                        	1-COUNT(wr.id) / COUNT(od.id) AS QualityRate
-                        	 from product p left join
+                        select p.name ,ROUND(cast(sum(r.star_rate)as float)/cast(count(r.id) as float),2) as star from product p join
+                        order_detail od on od.product_id = p.id join 
+                        rate r on r.order_detail_id = od.id
+                        group by p.id,p.name
+                        order by star desc""";
+            PreparedStatement pt = connection.prepareStatement(sql);
+            ResultSet rs = pt.executeQuery();
+            while (rs.next()) {
+                ArrayList<String> temp = new ArrayList<>();
+                temp.add(rs.getString("name"));
+                temp.add(rs.getString("star"));
+                list.add(temp);
+            }
+            rs.close();
+            pt.close();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+        return list;
+    }
+    public ArrayList<ArrayList<String>> getProductQuality(int type) {
+        ArrayList<ArrayList<String>> list = new ArrayList<>();
+        try {
+            String sql = """
+                        select Top 5  p.id, p.name,
+                        count(wr.id) as NumberOfWarranty, 
+                        count(od.id) as TotalUnitsSold, 
+                        1-ROUND(CAST(COUNT(wr.id) AS FLOAT) / CAST(COUNT(od.id) AS FLOAT), 2) AS QualityRate
+                         from product p left join
                         order_detail od on od.product_id=p.id left join
                         warranty_record wr on wr.order_detail_id = od.id
                         group by p.id, p.name
                         HAVING count(od.id) > 0
-                        order by QualityRate """ + (type==1?" desc":" asc") + ", TotalUnitsSold desc";
+                        order by QualityRate""" + (type == 1 ? " desc" : " asc") + ", TotalUnitsSold desc";
             PreparedStatement pt = connection.prepareStatement(sql);
-            
+
             ResultSet rs = pt.executeQuery();
-            while(rs.next()) {
+            while (rs.next()) {
                 ArrayList<String> temp = new ArrayList<>();
                 temp.add(rs.getString("id"));
                 temp.add(rs.getString("name"));
@@ -159,15 +188,16 @@ public class DAOJoin extends DBContext {
             }
             rs.close();
             pt.close();
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
         }
         return list;
     }
-    public ArrayList<String> getInformationWarranty(int id){
+
+    public ArrayList<String> getInformationWarranty(int id) {
         ArrayList<String> list = new ArrayList<>();
-        try{
+        try {
             String sql = """
                          select wr.warranty_date, c.firstname+c.lastname as customerName, c.phone, sn.sn, p.name, c.email from warranty_record wr join
                          order_detail od on od.id = wr.order_detail_id join
@@ -180,7 +210,7 @@ public class DAOJoin extends DBContext {
             PreparedStatement pt = connection.prepareStatement(sql);
             pt.setInt(1, id);
             ResultSet rs = pt.executeQuery();
-            if(rs.next()) {
+            if (rs.next()) {
                 list.add(rs.getString("warranty_date"));
                 list.add(rs.getString("customerName"));
                 list.add(rs.getString("phone"));
@@ -190,13 +220,14 @@ public class DAOJoin extends DBContext {
             }
             rs.close();
             pt.close();
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
         }
         return list;
     }
+
     public static void main(String[] args) {
-        System.out.println(new DAOJoin().getProductQuality(1).toString());
+        System.out.println(new DAOJoin().getProductQuality(2).toString());
     }
 }

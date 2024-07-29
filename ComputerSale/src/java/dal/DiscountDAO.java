@@ -3,6 +3,7 @@ package dal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -20,7 +21,6 @@ public class DiscountDAO extends DBContext {
                 rs.getInt("product_id"),
                 rs.getInt("quantity"),
                 rs.getInt("value"),
-
                 rs.getString("start_date"),
                 rs.getString("exp_date"),
                 rs.getInt("created_by"),
@@ -50,6 +50,31 @@ public class DiscountDAO extends DBContext {
 
     public ArrayList<Discount> getAll() {
         return get(null);
+    }
+
+    public ArrayList<Discount> getDiscountsOnGoing() {
+        String date = LocalDate.now().toString();
+        return get(" (start_date <" + date+" OR start_date ="+ date + ") and exp_date > " + date);
+    }
+    public Map<Integer, Discount> getAllMapKeyProductId() {
+        Map<Integer, Discount> discountProductMap = new HashMap<>();
+        try {
+            String sql = "SELECT * FROM discount where (start_date < ? or start_date = ?) and exp_date > ?";
+            PreparedStatement pt = connection.prepareStatement(sql);
+            pt.setString(1, LocalDate.now().toString());
+            pt.setString(2, LocalDate.now().toString());
+            pt.setString(3, LocalDate.now().toString());
+            ResultSet rs = pt.executeQuery();
+            while (rs.next()) {
+                Discount discount = new DiscountDAO().getByRS(rs);
+                discountProductMap.put(discount.getProduct_id(), discount);
+            }
+            rs.close();
+            pt.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return discountProductMap;
     }
 
     public ArrayList<Product> getTop3ProductsByDiscount() {
@@ -89,6 +114,37 @@ public class DiscountDAO extends DBContext {
         return discountProductMap;
     }
 
+    public Map<Integer, Integer> getDiscountProductID() {
+        Map<Integer, Integer> discountProductMap = new HashMap<>();
+        try {
+            String sql = "SELECT * FROM discount where (start_date < ? or start_date = ?) and exp_date > ?";
+            PreparedStatement pt = connection.prepareStatement(sql);
+            pt.setString(1, LocalDate.now().toString());
+            pt.setString(2, LocalDate.now().toString());
+            pt.setString(3, LocalDate.now().toString());
+            ResultSet rs = pt.executeQuery();
+            while (rs.next()) {
+                Discount discount = new DiscountDAO().getByRS(rs);
+                discountProductMap.put(discount.getId(), discount.getValue());
+            }
+            rs.close();
+            pt.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return discountProductMap;
+    }
+private ArrayList<Product> searchProductsByString(ArrayList<Product> list, String keyword) {
+        ArrayList<Product> result = new ArrayList<>();
+        String[] keywords = MyUtils.convertKeywords(keyword);
+
+        for (Product p : list) {
+            if (MyUtils.containsKeywords(p.getName(), keywords)) {
+                result.add(p);
+            }
+        }
+        return result;
+    }
     public Map<Discount, Product> searchByProductNameOrUser(String search) {
         Map<Discount, Product> discountProductMap = new HashMap<>();
         try {
@@ -200,10 +256,8 @@ public class DiscountDAO extends DBContext {
     public static void main(String[] args) {
         // Assume DiscountDAO().getAllWithDiscount() returns a Map<Discount, Product>
         // Example usage
-        Comparator<Discount> discountComparator = Comparator.comparing(Discount::getId).reversed();
-        Map<Discount, Product> p
-                = MyUtils.sortMap(new DiscountDAO().getAllWithDiscount(), discountComparator);
-        System.out.println(p);
+        System.out.println(new DiscountDAO().getDiscountProductID());
+
 
     }
 }

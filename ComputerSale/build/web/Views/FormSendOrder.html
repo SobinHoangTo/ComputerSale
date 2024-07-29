@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
-        <title>Invoice</title>
         <meta charset="UTF-8">
+        <title>Invoice</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
             body {
@@ -17,7 +17,6 @@
             .container {
                 padding: 20px;
                 background-color: white;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
                 margin-top: 20px;
                 border-radius: 10px;
             }
@@ -81,57 +80,54 @@
         <div class="container">
             <div class="header">
                 <div class="store-info">
-                    <div class="store-title"><strong>Linh và đồng bọn Store</strong></div>
+                    <div class="store-title"><strong>Linh and Associates Store</strong></div>
                     <div class="contact-info">
-                        <div>Địa chỉ: Đại học Fpt HL</div>
-                        <div>Điện thoại: 123456789</div>
+                        <div>Address: FPT University HL</div>
+                        <div>Phone: 123456789</div>
                     </div>
                 </div>
             </div>
-            <div class="actions">
-                Print | PDF | Email
-            </div>
             <div class="order-number">
-                Orders
+                Order
             </div>
             <div class="actions" style="text-align: center;">
-               Ngày: {date}
+                Date: {date}
             </div>
             <div class="customer-info">
-                <strong>THÔNG TIN KHÁCH HÀNG</strong><hr>
-                <p>Tên khách hàng: {name}
-                <br/>Điện thoại: {phone}
+                <strong>CUSTOMER INFORMATION</strong><hr/>
+                <p>Customer Name: {name}
+                    <br/>Phone: {phone}
                 </p>
             </div>
             <div class="order-info">
-                <strong>THÔNG TIN ĐƠN HÀNG</strong><hr>
-                <p>Mã vận đơn: {orderID}</p>
-                <p>Danh sách sách sản phẩm</p>
+                <strong>ORDER INFORMATION</strong><hr/>
+                <p>Order ID: {orderID}</p>
+                <p>Product List</p>
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 5%;">STT</th>
-                            <th style="width: 45%;">Tên hàng</th>
-                            <th style="width: 15%;">Đơn giá</th>
-                            <th style="width: 15%;">Số lượng</th>
-                            <th style="width: 30%;">Thành tiền</th>
+                            <th style="width: 3%;">No.</th>
+                            <th style="width: 47%;">Product Name</th>
+                            <th style="width: 15%;">Unit Price</th>
+                            <th style="width: 15%;">Quantity</th>
+                            <th style="width: 30%;">Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         {orderList}
                         <tr>
                             <td style="text-align: center;">1</td>
-                            <td>Laptop Asus TUF Gaming A15</td>
-                            <td style="text-align: right;">56.000</td>
+                            <td>Asus TUF Gaming A15 Laptop</td>
+                            <td style="text-align: right;">56,000</td>
                             <td style="text-align: right;">3</td>
-                            <td style="text-align: right;">172.000</td>
+                            <td style="text-align: right;">168,000</td>
                         </tr>
                         <!-- Add more rows as needed -->
                     </tbody>
                 </table>
             </div>
             <div class="total">
-                Tổng tiền: {total} VNĐ
+                Total Amount: {total} VND
             </div>
         </div>
     </body>

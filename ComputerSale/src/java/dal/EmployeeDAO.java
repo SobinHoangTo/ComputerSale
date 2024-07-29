@@ -20,8 +20,10 @@ public class EmployeeDAO extends DBContext {
                 rs.getString("address"),
                 rs.getString("firstname"),
                 rs.getString("lastname"),
+                rs.getString("img"),
                 rs.getString("reg_date"),
-                rs.getInt("role_id"));
+                rs.getInt("role_id"),
+                rs.getInt("status"));
     }
 
     private ArrayList<Employee> get(String value) {
@@ -62,14 +64,17 @@ public class EmployeeDAO extends DBContext {
     }
 
     public Employee checkLogin(String username, String password) {
-        ArrayList<Employee> temp = get("username like '" + username + "' and password like '" + new MyUtils().getMd5(password) + "'");
+        ArrayList<Employee> temp = get("username like '" + username + "' and password like '" + MyUtils.getMd5(password) + "'");
         return temp.isEmpty() ? null : temp.get(0);
     }
 
     public boolean checkSignUp(String username, String email) {
         return get("username like '" + username + "' or email like '" + email + "'").isEmpty();
     }
-
+    public Employee getByEmail(String email){
+        ArrayList<Employee> temp = get("email like '" + email + "'");
+        return temp==null||temp.isEmpty() ? null : temp.get(0);
+    }
     public ArrayList<Employee> getAllPaging(int pageNumber, int itemsPerPage) {
         ArrayList<Employee> list = new ArrayList<>();
         try {
@@ -95,6 +100,18 @@ public class EmployeeDAO extends DBContext {
             String sql = "UPDATE employee SET role_id = ? WHERE id = ?";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, roleId);
+            ps.setInt(2, id);
+            return (ps.executeUpdate() > 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public boolean updateEmployeeStatus(int id, int statusID) {
+        try {
+            String sql = "UPDATE employee SET [status] = ? WHERE id = ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, statusID);
             ps.setInt(2, id);
             return (ps.executeUpdate() > 0);
         } catch (Exception e) {
@@ -139,10 +156,66 @@ public class EmployeeDAO extends DBContext {
         }
         return false;
     }
-
-    public static void main(String[] args) {
-        for (Employee employee : new EmployeeDAO().getAll()) {
-            System.out.println(employee.toString().contains("linh"));
+    
+    public boolean editProfile( String phone, String address, String firstname, String lastname, String img, int id) {
+        try {
+            String sql = "UPDATE [dbo].[employee]\n"
+                    + "   SET [phone] = ?\n"
+                    + "      ,[address] = ?\n"
+                    + "      ,[firstname] = ?\n"
+                    + "      ,[lastname] = ?\n"
+                    + "      ,[img] = ?\n"
+                    + " WHERE [id] = ?";
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setString(1, phone);
+            st.setString(2, address);
+            st.setString(3, firstname);
+            st.setString(4, lastname);
+            st.setString(5, img);
+            st.setInt(6, id);
+            st.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
+        return true;
+    }
+
+    public boolean checkPassWord(String oldPassword, int id) {
+    try {
+        String sql = "SELECT password FROM [dbo].[employee] WHERE id = ?";
+        PreparedStatement st = connection.prepareStatement(sql);
+        st.setInt(1, id);
+        ResultSet rs = st.executeQuery();
+        if (rs.next()) {
+            String currentPassword = rs.getString("password");
+            return currentPassword.equals(new MyUtils().getMd5(oldPassword));
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+
+    
+    public boolean changePassword(int id, String newPassword) {
+        try {
+            String sql = "UPDATE [dbo].[employee] SET [password] = ? WHERE [id] = ?";
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setString(1, new MyUtils().getMd5(newPassword));
+            st.setInt(2, id);
+            st.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+    
+    public static void main(String[] args) {
+        System.out.println(new EmployeeDAO().checkSignUp("hoang1", "staff1@gmmail.com"));
+//        for (Employee employee : new EmployeeDAO().getAll()) {
+//            System.out.println(employee.toString().contains("a")?employee.toString():"");
+//        }
     }
 }

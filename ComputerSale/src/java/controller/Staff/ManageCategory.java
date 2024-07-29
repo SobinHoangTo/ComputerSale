@@ -1,15 +1,22 @@
 package controller.Staff;
 
 import dal.CategoryDAO;
+import dal.ProductDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
+import model.Brand;
+import model.Category;
 import model.Employee;
+import util.MyUtils;
 
 public class ManageCategory extends HttpServlet {
+
+    private final int ItemsOfPage = 5;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -30,8 +37,6 @@ public class ManageCategory extends HttpServlet {
                     addCategory(request, response);
                 case "edit" ->
                     editCategory(request, response);
-                case "delete" ->
-                    deleteCategory(request, response);
                 case "search" ->
                     searchCategory(request, response);
                 case "hidden" ->
@@ -46,7 +51,20 @@ public class ManageCategory extends HttpServlet {
 
     private void listCategory(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.setAttribute("listCategory", new CategoryDAO().getAll());
+        HttpSession session = request.getSession();
+        String act = request.getParameter("act");
+        ArrayList<Category> list = (ArrayList<Category>) session.getAttribute("listCategory");
+        list = (list == null || act != null) ? new CategoryDAO().getAll() : list;
+        session.setAttribute("listCategory", list);
+        
+        String pageNumberParam = request.getParameter("pageNumber");
+        //if pageNumber null then get selected page else return first page
+        int pageNumber = pageNumberParam != null ? Integer.parseInt(pageNumberParam) : 1;
+        int numberOfPages = (int) Math.ceil((double) list.size() / ItemsOfPage);
+
+        request.setAttribute("numberOfPage", numberOfPages);
+        request.setAttribute("pageNumber", pageNumber);
+        request.setAttribute("listCategory", MyUtils.getArrayListByPaging(list, pageNumber, ItemsOfPage));
         request.getRequestDispatcher("Views/Employ/Staff/ManageCategory.jsp").forward(request, response);
     }
 
@@ -56,6 +74,7 @@ public class ManageCategory extends HttpServlet {
         Employee currentE = (Employee) session.getAttribute("currentEmployee");
         String name = request.getParameter("name");
         new CategoryDAO().addCategory(name, currentE.getId());
+        session.setAttribute("listCategory", new CategoryDAO().getAll());
         response.sendRedirect("managecategory");
     }
 
@@ -66,25 +85,27 @@ public class ManageCategory extends HttpServlet {
         String name = request.getParameter("name");
         int id = Integer.parseInt(request.getParameter("id"));
         new CategoryDAO().editCategory(name, currentE.getId(), id);
-        response.sendRedirect("managecategory");
-    }
-
-    private void deleteCategory(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        new CategoryDAO().deleteCategory(Integer.parseInt(request.getParameter("id")));
+        session.setAttribute("listCategory", new CategoryDAO().getAll());
         response.sendRedirect("managecategory");
     }
 
     private void hiddenCategory(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         new CategoryDAO().hiddenCategory(Integer.parseInt(request.getParameter("id")));
+        HttpSession session = request.getSession();
+        session.setAttribute("listCategory", new CategoryDAO().getAll());
+        session.setAttribute("listProduct", new ProductDAO().getAll());
         response.sendRedirect("managecategory");
 //        request.getRequestDispatcher("Views/Employ/Staff/ProductsLists.jsp").forward(request, response);
     }
-    
+
     private void displayCategory(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         new CategoryDAO().displayCategory(Integer.parseInt(request.getParameter("id")));
+        HttpSession session = request.getSession();
+        session.setAttribute("listCategory", new CategoryDAO().getAll());
+        session.setAttribute("listProduct", new ProductDAO().getAll());
         response.sendRedirect("managecategory");
 //        request.getRequestDispatcher("Views/Employ/Staff/ProductsLists.jsp").forward(request, response);
     }
@@ -92,7 +113,24 @@ public class ManageCategory extends HttpServlet {
     private void searchCategory(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String keyword = request.getParameter("search").trim().replaceAll("\\s+", " ");
-        request.setAttribute("listCategory", new CategoryDAO().searchCategoryByKeyWord(keyword));
+        HttpSession session = request.getSession();
+        session.removeAttribute("listCategory");
+        ArrayList<Category> list = (ArrayList<Category>) session.getAttribute("listCategory");
+
+        ArrayList<Category> result = new CategoryDAO().searchCategoryByKeyWord(keyword);
+        //if nothing is found the return to the existed list
+        list = (result != null) ? result : list;
+        MyUtils.setAlertAttributes(request, !result.isEmpty(), "search " + list.size() + " results for '" + keyword + "'");
+        session.setAttribute("listCategory", list);
+
+        String pageNumberParam = request.getParameter("pageNumber");
+        //if pageNumber null then get selected page else return first page
+        int pageNumber = pageNumberParam != null ? Integer.parseInt(pageNumberParam) : 1;
+        int numberOfPages = (int) Math.ceil((double) list.size() / ItemsOfPage);
+
+        request.setAttribute("numberOfPage", numberOfPages);
+        request.setAttribute("pageNumber", pageNumber);
+        request.setAttribute("listCategory", MyUtils.getArrayListByPaging(list, pageNumber, ItemsOfPage));
         request.setAttribute("keyword", keyword);
         request.getRequestDispatcher("Views/Employ/Staff/ManageCategory.jsp").forward(request, response);
     }

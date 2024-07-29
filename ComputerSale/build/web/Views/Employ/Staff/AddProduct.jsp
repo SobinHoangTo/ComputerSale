@@ -22,123 +22,113 @@
     </head>
     <body>  
         <div class="container-fluid  bg-white position-relative d-flex p-0">
-            <%@include file="Views/HeadFoot/EmployeeSidebar.jsp" %>
+            <%@include file="../HeadFoot/EmployeeSidebar.jsp" %>
             <div class="content">
                 <%@include file="../HeadFoot/EmployeeNav.jsp" %>
                 <div class="container-fluid pt-4 px-4">
-                    <div class="row bg-light rounded justify-content-center mx-0">
+                    <div class="row p-4 bg-light rounded justify-content-center mx-0">
                         <h1 class="text-dark mt-3 mb-2 display-3">Add Products</h1>
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content bg-light">
-                                <!-- Modal Header -->
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="addProductModalLabel" style="color: red;">Add Product</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="container p-4">
+                            <!-- Form to add new product -->
+                            <form id="add-form" action="manageproducts" method="Post" enctype="multipart/form-data">
+                                <input type="hidden" name="action" value="add">
+                                <!-- Name -->
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Name <span class="text-danger">(*)</span></label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
                                 </div>
-                                <!-- Modal Body -->
-                                <div class="modal-body">
-                                    <!-- Form to add new product -->
-                                    <form id="add-form" action="manageproducts" method="Post" enctype="multipart/form-data">
-                                        <input type="hidden" name="action" value="add">
-                                        <!-- Name -->
-                                        <div class="mb-3">
-                                            <label for="name" class="form-label">Name <span class="text-danger">(*)</span></label>
-                                            <input type="text" class="form-control" id="name" name="name" required>
-                                        </div>
-                                        <!-- Represent Image -->
-                                        <div class="mb-3">
-                                            Represent Image <span class="text-danger">(*)</span> <br/>
-                                            <label for="addRepresentImage" class="form-label">
-                                                <p class="border">Add Image</p>
-                                            </label>
-                                            <input type="file" class="form-control d-none" id="addRepresentImage" name="representImage"
-                                                   accept="image/*" onchange="validateFileType('addRepresentImage')" required>
-                                        </div>
-                                        <!-- Image Preview -->
-                                        <div class="mb-3 p-2" style="position: relative;">
-                                            <img id="preview" src="<%=request.getContextPath()%>/Image/emty_image.jpg" alt="image preview"
-                                                 style="width: 350px; height: 250px"/>
-                                            <button type="button" id="removeImage" style="position: absolute; top: 5px; right: 5px; display: none;"
-                                                    onclick="removeSelectedImage()">X
-                                            </button>
-                                        </div>
-                                        <!-- Detail Images -->
-                                        <div class="mb-3">
-                                            <label for="detailImages" class="form-label">Detail Images <span
-                                                    class="text-danger">(*)</span></label>
-                                            <input type="file" class="form-control" id="addDetailImages" name="detailImages"
-                                                   accept="image/*" onchange="validateFileType('addDetailImages')" required multiple>
-                                        </div>
-                                        <!-- CPU -->
-                                        <div class="mb-3">
-                                            <label for="CPU" class="form-label">CPU <span class="text-danger">(*)</span></label>
-                                            <input type="text" class="form-control" id="CPU" name="CPU" required>
-                                        </div>
-                                        <!-- GPU -->
-                                        <div class="mb-3">
-                                            <label for="GPU" class="form-label">GPU<span class="text-danger">(*)</span></label>
-                                            <input type="text" class="form-control" id="GPU" name="GPU" required>
-                                        </div>
-                                        <!-- RAM -->
-                                        <div class="mb-3">
-                                            <label for="RAM" class="form-label">RAM <span class="text-danger">(*)</span></label>
-                                            <input type="text" class="form-control" id="RAM" name="RAM" required>
-                                        </div>
-                                        <!-- ROM -->
-                                        <div class="mb-3">
-                                            <label for="ROM" class="form-label">ROM <span class="text-danger">(*)</span></label>
-                                            <input type="text" class="form-control" id="ROM" name="ROM" required>
-                                        </div>
-                                        <!-- Monitor -->
-                                        <div class="mb-3">
-                                            <label for="monitor" class="form-label">Monitor <span class="text-danger">(*)</span></label>
-                                            <input type="text" class="form-control" id="monitor" name="monitor" required>
-                                        </div>
-                                        <!-- OS -->
-                                        <div class="mb-3">
-                                            <label for="OS" class="form-label">OS <span class="text-danger">(*)</span></label>
-                                            <input type="text" class="form-control" id="OS" name="OS" required>
-                                        </div>
-                                        <!-- Price -->
-                                        <div class="mb-3">
-                                            <label for="price" class="form-label">Price <span class="text-danger">(*)</span></label>
-                                            <input type="text" class="form-control format-number" id="price" name="price" required>
-                                        </div>
-                                        <!-- Quantity -->
-                                        <div class="mb-3">
-                                            <label for="quantity" class="form-label">Quantity <span class="text-danger">(*)</span></label>
-                                            <input type="number" class="form-control" id="quantity" name="quantity" required>
-                                        </div>
-                                        <!-- Description -->
-                                        <div class="mb-3">
-                                            <label for="description" class="form-label">Description <span class="text-danger">(*)</span></label>
-                                            <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
-                                        </div>
-                                        <!-- Brand ID -->
-                                        <div class="mb-3">
-                                            <label for="brand" class="form-label">Brand <span class="text-danger">(*)</span></label>
-                                            <select class="form-control" id="brand" name="brand" required>
-                                                <c:forEach items="${requestScope.listBrand}" var="i">
-                                                    <option value="${i.getId()}">${i.getName()}</option>
-                                                </c:forEach>
-                                            </select>
-                                        </div>
-                                        <!-- Category ID -->
-                                        <div class="mb-3">
-                                            <label for="category" class="form-label">Category <span class="text-danger">(*)</span></label>
-                                            <select class="form-control" id="category" name="category" required>
-                                                <c:forEach items="${requestScope.listCategory}" var="c">
-                                                    <option value="${c.getId()}">${c.getName()}</option>
-                                                </c:forEach>
-                                            </select>
-                                        </div>
-                                        <!-- Submit Button -->
-                                        <div class="modal-footer">
-                                            <button type="submit" class="btn btn-primary">Add Product</button>
-                                        </div>
-                                    </form>
+                                <!-- Represent Image -->
+                                <div class="mb-3">
+                                    Represent Image <span class="text-danger">(*)</span> <br/>
+                                    <label for="addRepresentImage" class="form-label">
+                                        <p class="border">Add Image</p>
+                                    </label>
+                                    <input type="file" class="form-control d-none" id="addRepresentImage" name="representImage"
+                                           accept="image/*" onchange="validateFileType('addRepresentImage')" required>
                                 </div>
-                            </div>
+                                <!-- Image Preview -->
+                                <div class="mb-3 p-2" style="position: relative;">
+                                    <img id="preview" src="<%=request.getContextPath()%>/Image/emty_image.jpg" alt="image preview"
+                                         style="width: 350px; height: 250px"/>
+                                    <button type="button" id="removeImage" style="position: absolute; top: 5px; right: 5px; display: none;"
+                                            onclick="removeSelectedImage()">X
+                                    </button>
+                                </div>
+                                <!-- Detail Images -->
+                                <div class="mb-3">
+                                    <label for="detailImages" class="form-label">Detail Images <span
+                                            class="text-danger">(*)</span></label>
+                                    <input type="file" class="form-control" id="addDetailImages" name="detailImages"
+                                           accept="image/*" onchange="validateFileType('addDetailImages')" required multiple>
+                                </div>
+                                <!-- CPU -->
+                                <div class="mb-3">
+                                    <label for="CPU" class="form-label">CPU <span class="text-danger">(*)</span></label>
+                                    <input type="text" class="form-control" id="CPU" name="CPU" required>
+                                </div>
+                                <!-- GPU -->
+                                <div class="mb-3">
+                                    <label for="GPU" class="form-label">GPU<span class="text-danger">(*)</span></label>
+                                    <input type="text" class="form-control" id="GPU" name="GPU" required>
+                                </div>
+                                <!-- RAM -->
+                                <div class="mb-3">
+                                    <label for="RAM" class="form-label">RAM <span class="text-danger">(*)</span></label>
+                                    <input type="text" class="form-control" id="RAM" name="RAM" required>
+                                </div>
+                                <!-- ROM -->
+                                <div class="mb-3">
+                                    <label for="ROM" class="form-label">ROM <span class="text-danger">(*)</span></label>
+                                    <input type="text" class="form-control" id="ROM" name="ROM" required>
+                                </div>
+                                <!-- Monitor -->
+                                <div class="mb-3">
+                                    <label for="monitor" class="form-label">Monitor <span class="text-danger">(*)</span></label>
+                                    <input type="text" class="form-control" id="monitor" name="monitor" required>
+                                </div>
+                                <!-- OS -->
+                                <div class="mb-3">
+                                    <label for="OS" class="form-label">OS <span class="text-danger">(*)</span></label>
+                                    <input type="text" class="form-control" id="OS" name="OS" required>
+                                </div>
+                                <!-- Price -->
+                                <div class="mb-3">
+                                    <label for="price" class="form-label">Price <span class="text-danger">(*)</span></label>
+                                    <input type="text" class="form-control format-number" id="price" name="price" required>
+                                </div>
+                                <!-- Quantity -->
+                                <div class="mb-3">
+                                    <label for="quantity" class="form-label">Quantity <span class="text-danger">(*)</span></label>
+                                    <input type="number" class="form-control" id="quantity" name="quantity" required>
+                                </div>
+                                <!-- Description -->
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description <span class="text-danger">(*)</span></label>
+                                    <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                                </div>
+                                <!-- Brand ID -->
+                                <div class="mb-3">
+                                    <label for="brand" class="form-label">Brand <span class="text-danger">(*)</span></label>
+                                    <select class="form-control" id="brand" name="brand" required>
+                                        <c:forEach items="${requestScope.listBrand}" var="i">
+                                            <option value="${i.getId()}">${i.getName()}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                                <!-- Category ID -->
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">Category <span class="text-danger">(*)</span></label>
+                                    <select class="form-control" id="category" name="category" required>
+                                        <c:forEach items="${requestScope.listCategory}" var="c">
+                                            <option value="${c.getId()}">${c.getName()}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                                <!-- Submit Button -->
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Add Product</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>

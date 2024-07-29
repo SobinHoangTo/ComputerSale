@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,7 +29,7 @@ import util.MyUtils;
  */
 public class ManageDiscount extends HttpServlet {
 
-    private final int ItemsOfPage = 5;
+    private final int ItemsOfPage = 10;
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -39,8 +40,9 @@ public class ManageDiscount extends HttpServlet {
         Map<Discount, Product> searchResults = null;
 //check search words product name or user
         if (searchQuery != null && !searchQuery.isEmpty()) {
-            searchResults = new DiscountDAO().searchByProductNameOrUser(searchQuery);
-            MyUtils.setAlertAttributes(request, searchResults != null, "find " + searchResults.size() + " of '" + searchQuery + "'");
+            
+            searchResults = searchProductsByString(new DiscountDAO().getAllWithDiscount(), searchQuery);
+            MyUtils.setAlertAttributes(request, !searchResults.isEmpty(), "find " + searchResults.size() + " of '" + searchQuery + "'");
         }
 
         if (statusParam != null && !statusParam.isEmpty()) {
@@ -73,6 +75,19 @@ public class ManageDiscount extends HttpServlet {
         request.setAttribute("discount", MyUtils.getMapByPaging(searchResults, pageNumber, ItemsOfPage));
         request.setAttribute("employee", new EmployeeDAO().getAll());
         request.getRequestDispatcher("Views/Employ/Staff/ManageDiscount.jsp?pageNumber=" + pageNumber).forward(request, response);
+    }
+
+    private Map<Discount, Product> searchProductsByString(Map<Discount, Product> list, String keyword) {
+        Map<Discount, Product> result = new HashMap<>();
+        String[] keywords = MyUtils.convertKeywords(keyword);
+        for (Map.Entry<Discount, Product> entry : list.entrySet()) {
+            Discount key = entry.getKey();
+            Product p = entry.getValue();
+            if (MyUtils.containsKeywords(p.getName(), keywords)) {
+                result.put(key, p);
+            }
+        }
+        return result;
     }
 
     private Map<Discount, Product> filterStatus(int status) {
@@ -133,17 +148,21 @@ public class ManageDiscount extends HttpServlet {
             LocalDate endDate = LocalDate.parse(expDate);
             boolean checkNumber = quantity > 0 && value > 0;
             boolean checkDate = endDate.isAfter(LocalDate.now()) && startDateCheck.isAfter(LocalDate.now());
+            boolean checkValid = endDate.isAfter(startDateCheck);
             String mess;
             if (checkNumber) {
-                if (checkDate) {
+                if (checkDate && checkValid) {
                     int id = Integer.parseInt(request.getParameter("id"));
                     return new Discount(id, productId, quantity, value, startDate, expDate, currentE.getId(), 1);
-                } else {
+                } else if (checkDate == false) {
                     MyUtils.setAlertAttributes(request, false, "Start date or Experation Date is not in the future");
+                    doGet(request, response);
+                } else if (checkValid) {
+                    MyUtils.setAlertAttributes(request, false, "Start date must be before Experation Date");
                     doGet(request, response);
                 }
             } else {
-                MyUtils.setAlertAttributes(request, checkDate, "Quantity or Values is smaller than 0.");
+                MyUtils.setAlertAttributes(request, checkNumber, "Quantity or Values is smaller than 0.");
                 doGet(request, response);
             }
         } catch (IllegalArgumentException e) {

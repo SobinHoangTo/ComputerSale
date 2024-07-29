@@ -32,6 +32,28 @@ public class ProductDAO extends DBContext {
         return list;
     }
 
+    public ArrayList<Product> getAvailable(String extend) {
+        ArrayList<Product> list = new ArrayList<>();
+        try {
+            String sql = "select * from product where status=1 ";
+            if (extend != null && !extend.isBlank()) {
+                sql += " and " + extend;
+            }
+            PreparedStatement pt = connection.prepareStatement(sql);
+            ResultSet rs = pt.executeQuery();
+            while (rs.next()) {
+                list.add(getByRS(rs));
+            }
+            rs.close();
+            pt.close();
+        } catch (Exception a) {
+            System.out.println(a.getMessage());
+            list.clear();
+            return list;
+        }
+        return list;
+    }
+
     public ArrayList<Product> getRelatedProducts(int id) {
         ArrayList<Product> list = new ArrayList<>();
         try {
@@ -57,9 +79,16 @@ public class ProductDAO extends DBContext {
     public ArrayList<Product> getHomeProduct() {
         ArrayList<Product> list = new ArrayList<>();
         try {
-            String sql = "SELECT top 8 p.* \n"
-                    + "FROM product p";
+            String sql = "SELECT * FROM product \n"
+                    + "WHERE id IN (\n"
+                    + "SELECT TOP 8 product_id FROM discount\n"
+                    + "WHERE (start_date < ? OR start_date= ? ) AND exp_date > ?\n"
+                    + "GROUP BY product_id,value,start_date\n"
+                    + "ORDER BY [value] )";
             PreparedStatement pt = connection.prepareStatement(sql);
+            pt.setString(1, LocalDate.now().toString());
+            pt.setString(2, LocalDate.now().toString());
+            pt.setString(3, LocalDate.now().toString());
             ResultSet rs = pt.executeQuery();
             while (rs.next()) {
                 list.add(getByRS(rs));
@@ -99,7 +128,7 @@ public class ProductDAO extends DBContext {
     }
 
     public ArrayList<Product> getAllByFilter(String filter) {
-        return get(filter);
+        return getAvailable(filter);
     }
 
     public Product getById(int id) {
@@ -127,18 +156,6 @@ public class ProductDAO extends DBContext {
                 rs.getInt("modified_by"),
                 rs.getString("modified_on"),
                 rs.getInt("status"));
-    }
-
-    public void deleteProductByID(int id) {
-        try {
-            String sql = "DELETE FROM [dbo].[product]\n"
-                    + "      WHERE [id] = ?";
-            PreparedStatement st = connection.prepareStatement(sql);
-            st.setInt(1, id);
-            st.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     public boolean addProduct(String name, String CPU, String GPU, String RAM, String ROM, String monitor, String OS,
@@ -279,9 +296,11 @@ public class ProductDAO extends DBContext {
 
     public boolean displayProduct(int id) {
         try {
-            String sql = "UPDATE [dbo].[product]\n"
-                    + "   SET [status] = 1\n"
-                    + "      WHERE [id] = ?";
+            String sql = "UPDATE [dbo].[product] SET [status] = 1  WHERE [id] = (SELECT p.id \n" +
+"    FROM product p \n" +
+"    JOIN brand b ON b.id=p.brand_id\n" +
+"	Join category c on c.id=p.category_id\n" +
+"    WHERE b.status = 1 and c.status=1 and p.id=?)";
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, id);
             st.executeUpdate();
@@ -355,26 +374,6 @@ public class ProductDAO extends DBContext {
         return total;
     }
 
-    // Method to search products by keyword with pagination
-    public List<Product> searchProductByKeyWord(String keyword, int page, int itemsPerPage) {
-        List<Product> list = new ArrayList<>();
-        String sql = "SELECT * FROM product WHERE name LIKE ? ORDER BY id OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try {
-            PreparedStatement st = connection.prepareStatement(sql);
-            st.setString(1, "%" + keyword + "%");
-            st.setInt(2, (page - 1) * itemsPerPage);
-            st.setInt(3, itemsPerPage);
-            ResultSet rs = st.executeQuery();
-            while (rs.next()) {
-                // Assuming you have a Product constructor that takes a ResultSet as a parameter
-                list.add(getByRS(rs));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
     // Method to get the total number of products by category
     public int getTotalProductsByCategory(int categoryId) {
         int total = 0;
@@ -426,6 +425,6 @@ public class ProductDAO extends DBContext {
     }
 
     public static void main(String[] args) {
-        System.out.println(new ProductDAO().getAll());
+        System.out.println(new ProductDAO().getHomeProduct());
     }
 }

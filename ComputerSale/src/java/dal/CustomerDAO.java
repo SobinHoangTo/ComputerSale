@@ -59,7 +59,7 @@ public class CustomerDAO extends DBContext {
         return get("id = " + id).get(0);
     }
     public Customer checkLogin(String username, String password) {
-        ArrayList<Customer> temp = get("username like '" + username + "' and password like '" + new MyUtils().getMd5(password) + "'");
+        ArrayList<Customer> temp = get("username like '" + username + "' and password like '" + MyUtils.getMd5(password) + "'");
         return temp.isEmpty() ? null : temp.get(0);
     }
 
@@ -72,7 +72,7 @@ public class CustomerDAO extends DBContext {
             String sql = "insert into customer(username,password,email,phone,address,firstname,lastname,reg_date) values(?,?,?,?,?,?,?,?)";
             PreparedStatement pt = connection.prepareStatement(sql);
             pt.setString(1, username);
-            pt.setString(2, new MyUtils().getMd5(password));
+            pt.setString(2, password!=null?MyUtils.getMd5(password):null);
             pt.setString(3, email);
             pt.setString(4, phone);
             pt.setString(5, address);
@@ -111,24 +111,22 @@ public class CustomerDAO extends DBContext {
         return null;
     }
 
-    public boolean editProfile(String email, String phone, String address, String firstname, String lastname, String img, int id) {
+    public boolean editProfile(String phone, String address, String firstname, String lastname, String img, int id) {
         try {
             String sql = "UPDATE [dbo].[customer]\n"
-                    + "   SET [email] = ?\n"
-                    + "      ,[phone] = ?\n"
+                    + "   SET [phone] = ?\n"
                     + "      ,[address] = ?\n"
                     + "      ,[firstname] = ?\n"
                     + "      ,[lastname] = ?\n"
                     + "      ,[img] = ?\n"
                     + " WHERE [id] = ?";
             PreparedStatement st = connection.prepareStatement(sql);
-            st.setString(1, email);
-            st.setString(2, phone);
-            st.setString(3, address);
-            st.setString(4, firstname);
-            st.setString(5, lastname);
-            st.setString(6, img);
-            st.setInt(7, id);
+            st.setString(1, phone);
+            st.setString(2, address);
+            st.setString(3, firstname);
+            st.setString(4, lastname);
+            st.setString(5, img);
+            st.setInt(6, id);
             st.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -145,7 +143,7 @@ public boolean checkPassWord(String oldPassword, int id) {
         ResultSet rs = st.executeQuery();
         if (rs.next()) {
             String currentPassword = rs.getString("password");
-            return currentPassword.equals(new MyUtils().getMd5(oldPassword));
+            return currentPassword.equals(MyUtils.getMd5(oldPassword));
         }
     } catch (SQLException e) {
         e.printStackTrace();
@@ -158,7 +156,7 @@ public boolean checkPassWord(String oldPassword, int id) {
         try {
             String sql = "UPDATE [dbo].[customer] SET [password] = ? WHERE [id] = ?";
             PreparedStatement st = connection.prepareStatement(sql);
-            st.setString(1, new MyUtils().getMd5(newPassword));
+            st.setString(1, MyUtils.getMd5(newPassword));
             st.setInt(2, id);
             st.executeUpdate();
         } catch (SQLException e) {
@@ -167,8 +165,10 @@ public boolean checkPassWord(String oldPassword, int id) {
         }
         return true;
     }
-    
-    public static void main(String[] args) {
-        System.out.println(new CustomerDAO().editProfile("user1@example.com", "123456789", "123 ABC, City, Country", "Johnn", "Cenaaa", "Screenshot 2024-06-25 214629.png",1));
-}
+
+    public Customer getByEmail(String email){
+        ArrayList<Customer> temp = get("email like '" + email + "'");
+        return temp==null||temp.isEmpty() ? null : temp.get(0);
+    }
+
 }

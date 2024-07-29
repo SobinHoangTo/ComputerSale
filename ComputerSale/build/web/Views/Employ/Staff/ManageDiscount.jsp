@@ -70,7 +70,8 @@
                                     <form class="d-flex" role="search" action="managediscount" method="get">
                                         <div class="input-group p-2">
                                             <input class="form-control me-2" type="search" 
-                                                   placeholder="${param.search!=null? param.search:'Search by Product Name or User Name'}"
+                                                   placeholder="Search by Product Name"
+                                                   value="${param.search}"
                                                    aria-label="Search" name="search">
                                             <button class="btn btn-outline-success" type="submit">
                                                 <i class="bi bi-search"></i>
@@ -145,18 +146,7 @@
                                                     <tr>
                                                         <td style="text-align: center;">${discount.id}</td>
                                                         <td style="max-width: 150px;">
-                                                            <a href="productdetails?id=${product.id}"
-                                                               class="text-decoration-none text-white">
-                                                                <div class="card text-bg-white">
-                                                                    <img src="<%=request.getContextPath()%>/Image/Products/${product.representImage}" 
-                                                                         class="card-img" alt="..."
-                                                                         >
-                                                                    <div class="card-img-overlay d-flex align-items-end"" style=" background: rgba(0, 0, 0, 0.25);">
-                                                                        <h5 class="card-title text-white">${product.name}</h5>
-                                                                    </div>
-                                                                </div>
-
-                                                            </a>
+                                                            <a href="productdetails?id=${product.id}">${product.name}</a>
                                                         </td> 
                                                         <td style="text-align: right;">${discount.quantity}</td>
                                                         <td style="text-align: right;">${discount.value}%</td>

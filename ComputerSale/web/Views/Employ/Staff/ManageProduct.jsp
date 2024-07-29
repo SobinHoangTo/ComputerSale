@@ -25,6 +25,27 @@
         <link href="cssE/bootstrap.min.css" rel="stylesheet">
         <!-- Template Stylesheet -->
         <link href="cssE/style.css" rel="stylesheet">
+        <style>
+            .image-container {
+                position: relative;
+                display: inline-block;
+            }
+            .remove-image-button {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                background-color: red;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                padding: 5px 10px;
+                cursor: pointer;
+                font-size: 18px;
+            }
+            .remove-image-button:hover {
+                background-color: darkred;
+            }
+        </style>
     </head>
     <body>  
         <div class="container-fluid  bg-white position-relative d-flex p-0">
@@ -66,10 +87,10 @@
                                     <form action="manageproducts" method="post" role="search">
                                         <input type="hidden" name="action" value="categoryfilter">
                                         <div class="input-group">
-                                            <select name="productcate"  id="productcate" class="form-select me-2">
-                                                <option value="0" <c:if test="${empty currentCategoryId}">selected</c:if>>All Category</option>
+                                            <select name="productcate" id="productcate" class="form-select me-2">
+                                                <option value="0" ${(empty requestScope.currentCategoryId || requestScope.currentCategoryId==0)?'':'selected'}">All Category</option>
                                                 <c:forEach items="${requestScope.listCategory}" var="cp">
-                                                    <option value="${cp.getId()}" ${cp.getId() == currentCategoryId?"selected":""}>${cp.getName()}</option>
+                                                    <option value="${cp.getId()}" ${cp.getId() == requestScope.currentCategoryId?"selected":""}>${cp.getName()}</option>
                                                 </c:forEach>
                                             </select>
                                             <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i></button>
@@ -79,9 +100,9 @@
 
                                 <!-- Add Product Button -->
                                 <div class="container col-md-4 mb-3" style="width: 25%;">
-                                    <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                                    <a href="addproduct" class="btn btn-primary w-100">
                                         Add Product
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -107,20 +128,14 @@
                                             </div>
                                             <!-- Represent Image -->
                                             <div class="mb-3">
-                                                Represent Image <span class="text-danger">(*)</span> <br/>
-                                                <label for="addRepresentImage" class="form-label">
-                                                    <p class="border">Add Image</p>
-                                                </label>
-                                                <input type="file" class="form-control d-none" id="addRepresentImage" name="representImage"
-                                                       accept="image/*" onchange="validateFileType('addRepresentImage')" required>
-                                            </div>
-                                            <!-- Image Preview -->
-                                            <div class="mb-3 p-2" style="position: relative;">
-                                                <img id="preview" src="<%=request.getContextPath()%>/Image/emty_image.jpg" alt="image preview"
-                                                     style="width: 350px; height: 250px"/>
-                                                <button type="button" id="removeImage" style="position: absolute; top: 5px; right: 5px; display: none;"
-                                                        onclick="removeSelectedImage()">X
-                                                </button>
+                                                <label for="RepresentImage" class="form-label">Represent Image <span class="text-danger"> (*)</span></label><br/>
+                                                <div class="image-container mb-2">
+                                                    <img src="<%=request.getContextPath()%>/Image/emty_image.jpg" id="addRepresentImage" class="img-fluid" style="width: 200px; border: 1px solid #555;">
+                                                    <button type="button" id="addRemoveImageButton" class="remove-image-button" style="display: none;" 
+                                                            onclick="removeImage('addRepresentImage', 'addRemoveImageButton', 'addImageUpload', '<%=request.getContextPath()%>/Image/emty_image.jpg')">&times;</button>
+                                                </div>
+                                                <input type="file" class="form-control" id="addImageUpload" name="representImage"
+                                                       accept="image/*" onchange="previewImage(this, 'addRepresentImage', 'addRemoveImageButton')" required>
                                             </div>
                                             <!-- Detail Images -->
                                             <div class="mb-3">
@@ -201,30 +216,26 @@
                                 </div>
                             </div>
                         </div>
+
                         <!-- Product Table -->
                         <div class="container p-4">
+                            <c:if test="${not empty alertMessage}">
+                                <div class="alert alert-${alertType} alert-dismissible fade show" role="alert">
+                                    ${alertMessage}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            </c:if>
                             <div class="table-responsive">
-                                <c:if test="${not empty alertMessage}">
-                                    <div class="alert alert-${alertType} alert-dismissible fade show" role="alert">
-                                        ${alertMessage}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                    </div>
-                                </c:if>
                                 <table class="table table-bordered table-striped">
                                     <thead class="table-light">
                                         <tr class="text-nowrap">
                                             <th>Name</th>
                                             <th>Represent Image</th> 
-<!--                                            <th>Detail Image(s)</th>
-                                              <th>Price</th>
-                                            <th>Quantity</th>
-                                            <th>Brand</th>
-                                            <th>Category</th>-->
                                             <th>Created By</th>
                                             <th>Created On</th>
                                             <th>Modified By</th>
                                             <th>Modified On</th>
-                                            <th>Actions</th>
+                                            <th class="text-center">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -239,30 +250,6 @@
                                                 <td class="text-center"> <!-- Ảnh đại diên cho sản phẩm -->
                                                     <img class="img-fluid rounded-2" src="<%=request.getContextPath()%>/Image/Products/${product.representImage}" alt="${product.name}" style="max-width: 150px;">
                                                 </td> 
-<!--                                                <td class="text-center">
-                                                    Detail Images for the product
-                                                    <c:forEach items="${listImage}" var="image">
-                                                        <c:if test="${image.product_id == product.id}">
-                                                            <img class="img-fluid" src="<%=request.getContextPath()%>/Image/Products/ImgList/${image.img}" alt="detailImages" style="max-width: 150px;">
-                                                        </c:if>
-                                                    </c:forEach>
-                                                </td>
-                                                <td  class="text-end">${product.price}</td>
-                                            <td  class="text-end">${product.quantity}</td>
-                                            <td>
-                                                <c:forEach items="${requestScope.listBrand}" var="b">
-                                                    <c:if test="${b.getId() == product.getBrand_id()}">
-                                                        ${b.getName()}
-                                                    </c:if>
-                                                </c:forEach>
-                                            </td>
-                                            <td>
-                                                <c:forEach items="${requestScope.listCategory}" var="c">
-                                                    <c:if test="${c.getId() == product.getCategory_id()}">
-                                                        ${c.getName()}
-                                                    </c:if>
-                                                </c:forEach>
-                                            </td>-->
                                                 <td class="text-end">${product.created_by}</td>
                                                 <td class="text-end">${product.created_on}</td>
                                                 <td class="text-end">${product.modified_by}</td>
@@ -276,8 +263,8 @@
                                                                     <input type="hidden" name="action" value="display">
                                                                     <input type="hidden" name="id" value="${product.id}">
                                                                     <!-- Display Status Button -->
-                                                                    <button type="submit" class="btn btn-secondary btn-sm view-btn" title="Display" data-bs-toggle="modal">
-                                                                        <i class="bi bi-eye"></i>
+                                                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Display" data-bs-toggle="modal">
+                                                                        <i class="bi bi-toggle-off"></i>
                                                                     </button>
                                                                 </form>
                                                             </div>
@@ -290,12 +277,19 @@
                                                                     <input type="hidden" name="action" value="hidden">
                                                                     <input type="hidden" name="id" value="${product.id}">
                                                                     <!-- Display Status Button -->
-                                                                    <button type="submit" class="btn btn-info btn-sm view-btn" title="Hidden" data-bs-toggle="modal">
-                                                                        <i class="bi bi-eye"></i>
+                                                                    <button type="submit" class="btn btn-outline-success btn-sm" title="Hidden" data-bs-toggle="modal">
+                                                                        <i class="bi bi-toggle-on"></i>
                                                                     </button>
                                                                 </form>
                                                             </div>
                                                         </c:if>
+
+                                                        <!--Button Serial Numbers-->   
+                                                        <div class="btn-group" role="group" aria-label="Product Actions">
+                                                            <a href="manageserialnumber?productID=${product.id}" class="btn btn-primary btn-sm">
+                                                                <i class="bi bi-upc-scan"></i>
+                                                            </a>
+                                                        </div>
 
                                                         <!--Button Edit-->
                                                         <div class="btn-group" role="group" aria-label="Product Actions">
@@ -304,19 +298,7 @@
                                                                 <i class="bi bi-pencil-square"></i> 
                                                             </button>
                                                         </div>
-
-                                                        <!--Button Delete-->
-                                                        <div class="btn-group" role="group" aria-label="Product Actions">
-                                                            <form action="manageproducts" method="post">
-                                                                <input type="hidden" name="action" value="delete">
-                                                                <input type="hidden" name="id" value="${product.id}">
-                                                                <button type="submit" class="btn btn-danger btn-sm" title="Delete" id="deleteButton">
-                                                                    <i class="bi bi-trash"></i>
-                                                                </button>
-                                                            </form>
-                                                        </div>
                                                     </div>
-
                                                     <!-- Edit Product Modal --> 
                                                     <div class="modal fade" id="editProductModal${product.id}" tabindex="-1" aria-labelledby="editProductModalLabel${product.id}" aria-hidden="true">
                                                         <div class="modal-dialog modal-dialog-centered">
@@ -334,73 +316,75 @@
                                                                         <input type="hidden" name="id" value="${product.id}">
                                                                         <!-- Name -->
                                                                         <div class="form-group mb-3">
-                                                                            <label for="name" class="form-label">Name</label>
+                                                                            <label for="name" class="form-label">Name<span class="text-danger"> (*)</span></label>
                                                                             <input type="text" class="form-control" id="name" name="name" value="${product.getName()}" required>
                                                                         </div>
                                                                         <!-- Ảnh đại diện sản phẩm -->
                                                                         <div class="mb-3">
-                                                                            <label for="representImage" class="form-label">Represent Image</label><br/><br/>
+                                                                            <label for="representImage" class="form-label">Represent Image<span class="text-danger"> (*)</span></label><br/><br/>
                                                                             <img id="previewEdit${product.id}" src="Image/Products/${product.getRepresentImage()}" alt="${product.getName()}" style="width: 30%"/>
                                                                             <button type="button" id="removeImageEdit${product.id}" onclick="removeSelectedImageEdit(${product.id})" style="display: none;">Remove Image</button>
                                                                             <input type="hidden" name="existingImage" value="${product.getRepresentImage()}">
                                                                             <input type="file" class="form-control" id="editRepresentImage${product.id}" name="representImage" accept="image/*" data-existing-image="${product.getRepresentImage()}" onchange="validateFileType('editRepresentImage${product.id}', 'previewEdit${product.id}', 'removeImageEdit${product.id}')">
                                                                         </div>
+                                                                        <!-- Detail Images -->
                                                                         <div class="mb-3">
-                                                                            <label for="listImage" class="form-label">list Image</label><br/><br/>
+                                                                            <label for="listImage" class="form-label">List Image<span class="text-danger"> (*)</span></label><br/><br/>
                                                                             <c:forEach items="${listImage}" var="image">
                                                                                 <c:if test="${image.product_id == product.id}">
                                                                                     <img class="img-fluid" src="<%=request.getContextPath()%>/Image/Products/ImgList/${image.img}" alt="detailImages" style="max-width: 150px;">
                                                                                 </c:if>
                                                                             </c:forEach>
+                                                                            <br/><input type="file" class="form-control" name="detailImages" id="detailImages" multiple>
                                                                         </div>
                                                                         <!-- CPU -->
                                                                         <div class="form-group mb-3">
-                                                                            <label for="CPU" class="form-label">CPU</label>
+                                                                            <label for="CPU" class="form-label">CPU<span class="text-danger"> (*)</span></label>
                                                                             <input type="text" class="form-control" id="CPU" name="CPU" value="${product.getCPU()}" required>
                                                                         </div>
                                                                         <!-- GPU -->
                                                                         <div class="form-group mb-3">
-                                                                            <label for="GPU" class="form-label">GPU</label>
+                                                                            <label for="GPU" class="form-label">GPU<span class="text-danger"> (*)</span></label>
                                                                             <input type="text" class="form-control" id="GPU" name="GPU" value="${product.getGPU()}" required>
                                                                         </div>
                                                                         <!-- RAM -->
                                                                         <div class="form-group mb-3">
-                                                                            <label for="RAM" class="form-label">RAM</label>
+                                                                            <label for="RAM" class="form-label">RAM<span class="text-danger"> (*)</span></label>
                                                                             <input type="text" class="form-control" id="RAM" name="RAM" value="${product.getRAM()}" required>
                                                                         </div>
                                                                         <!-- ROM -->
                                                                         <div class="form-group mb-3">
-                                                                            <label for="ROM" class="form-label">ROM</label>
+                                                                            <label for="ROM" class="form-label">ROM<span class="text-danger"> (*)</span></label>
                                                                             <input type="text" class="form-control" id="ROM" name="ROM" value="${product.getROM()}" required>
                                                                         </div>
                                                                         <!-- Monitor -->
                                                                         <div class="form-group mb-3">
-                                                                            <label for="monitor" class="form-label">Monitor</label>
+                                                                            <label for="monitor" class="form-label">Monitor<span class="text-danger"> (*)</span></label>
                                                                             <input type="text" class="form-control" id="monitor" name="monitor" value="${product.getMonitor()}" required>
                                                                         </div>
                                                                         <!-- OS -->
                                                                         <div class="form-group mb-3">
-                                                                            <label for="OS" class="form-label">OS</label>
+                                                                            <label for="OS" class="form-label">OS<span class="text-danger"> (*)</span></label>
                                                                             <input type="text" class="form-control" id="OS" name="OS" value="${product.getOS()}" required>
                                                                         </div>
                                                                         <!-- Price -->
                                                                         <div class="form-group mb-3">
-                                                                            <label for="price" class="form-label">Price</label>
+                                                                            <label for="price" class="form-label">Price<span class="text-danger"> (*)</span></label>
                                                                             <input type="number" class="form-control" id="price-edit" name="price" value="${product.getPrice()}" required>
                                                                         </div>
-
+                                                                        <!-- Quantity -->
                                                                         <div class="form-group mb-3">
-                                                                            <label for="quantity" class="form-label">Quantity</label>
+                                                                            <label for="quantity" class="form-label">Quantity<span class="text-danger"> (*)</span></label>
                                                                             <input type="number" class="form-control" id="quantity" name="quantity" value="${product.getQuantity()}" required>
                                                                         </div>
                                                                         <!-- Description -->
                                                                         <div class="form-group mb-3">
-                                                                            <label for="description" class="form-label">Description</label>
+                                                                            <label for="description" class="form-label">Description<span class="text-danger"> (*)</span></label>
                                                                             <textarea class="form-control" id="description" name="description" rows="3" required>${product.getDescription()}</textarea>
                                                                         </div>
                                                                         <!-- Brand -->
                                                                         <div class="form-group mb-3">
-                                                                            <label for="brand" class="form-label">Brand</label>
+                                                                            <label for="brand" class="form-label">Brand<span class="text-danger"> (*)</span></label>
                                                                             <select class="form-control" id="brand" name="brand" required>
                                                                                 <c:forEach items="${requestScope.listBrand}" var="brand">
                                                                                     <option value="${brand.getId()}"
@@ -414,7 +398,7 @@
                                                                         </div>
                                                                         <!-- Category -->
                                                                         <div class="form-group mb-3">
-                                                                            <label for="category" class="form-label">Category</label>
+                                                                            <label for="category" class="form-label">Category<span class="text-danger"> (*)</span></label>
                                                                             <select class="form-control" id="category" name="category" required>
                                                                                 <c:forEach items="${requestScope.listCategory}" var="c">
                                                                                     <option value="${c.getId()}" ${c.getId() == product.getCategory_id()?"selected":""}>${c.getName()}</option>
@@ -437,45 +421,79 @@
                                 </table>
                             </div>
                         </div>
-                        <!--Bắt đầu danh sách trang-->
-                        <!--                        <nav aria-label="Page navigation example ">
-                                                    <ul class="pagination justify-content-end  p-2">
-                                                        <li class="page-item">
-                                                            Check if page =1 => disable
-                                                            <a class="page-link" href="<%=request.getContextPath()%>/manageproducts?pageNumber=${(requestScope.pageNumber-1)<1?requestScope.numberOfPage:(requestScope.pageNumber-1)}&productcate=${param.productcate}">Previous</a>
-                                                        </li>
-                        <c:forEach begin="1" end="${requestScope.numberOfPage}" var="i">
-                            <li class="page-item ${i==requestScope.pageNumber?"active":""}" active><a class="page-link" href="<%=request.getContextPath()%>/manageproducts?pageNumber=${i}&productcate=${param.productcate}">${i}</a></li>
-                        </c:forEach>
-                    <li class="page-item">
-                        <a class="page-link" href="<%=request.getContextPath()%>/manageproducts?pageNumber=${(requestScope.pageNumber+1)>requestScope.numberOfPage?1:(requestScope.pageNumber+1)}&productcate=${param.productcate}">Next</a>
-                    </li>
-                </ul>
-            </nav>-->
+                        <!--pagination-->
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-end">
+                                <li class="page-item"><a class="page-link" href="<%=request.getContextPath()%>/manageproducts?pageNumber=1">Previous</a></li>
+                                    <c:if test="${param.pageNumber==1}">
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="<%=request.getContextPath()%>/manageproducts?pageNumber=${(param.pageNumber-1)<1?requestScope.numberOfPage:(param.pageNumber-1)}" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                            <span class="sr-only">Previous</span>
+                                        </a>
+                                    </li>
+                                </c:if>
+                                <c:if test="${requestScope.numberOfPage<=5}">
+                                    <c:forEach begin="1" end="${requestScope.numberOfPage}" var="i">
+                                        <li class="page-item ${i==param.pageNumber?"active":""}">
+                                            <a class="page-link" href="<%=request.getContextPath()%>/manageproducts?pageNumber=${i}">${i}</a>
+                                        </li>
+                                    </c:forEach>
+                                </c:if>
+                                <c:if test="${requestScope.numberOfPage>5}">
+                                    <c:choose>
+                                        <c:when test="${param.pageNumber-3<=0}">
+                                            <c:forEach begin="1" end="5" var="i">
+                                                <li class="page-item ${i==param.pageNumber?"active":""}">
+                                                    <a class="page-link" href="<%=request.getContextPath()%>/manageproducts?pageNumber=${i}">${i}</a>
+                                                </li>
+                                            </c:forEach>
+                                            <li>
+                                                <a class="page-link" href="#">...</a>
+                                            </li>
+                                        </c:when>
+                                        <c:when test="${param.pageNumber+2>=requestScope.numberOfPage}">
+                                            <li>
+                                                <a class="page-link" href="#">...</a>
+                                            </li>
+                                            <c:forEach begin="${requestScope.numberOfPage-4}" end="${requestScope.numberOfPage}" var="i">
+                                                <li class=" ${i==param.pageNumber?"active":""}">
+                                                    <a class="page-link" href="<%=request.getContextPath()%>/manageproducts?pageNumber=${i}">${i}</a>
+                                                </li>
+                                            </c:forEach>
 
-                        <!--                        <nav aria-label="Page navigation">
-                                                    <ul class="pagination">
-                        <c:forEach begin="1" end="${numberOfPage}" var="i">
-                            <li class="page-item ${pageNumber == i ? 'active' : ''}">
-                                <a class="page-link" href="manageproducts?pageNumber=${i}">${i}</a>
-                            </li>
-                        </c:forEach>
-                    </ul>
-                </nav>-->
-                        <ul class="pagination">
-                            <c:forEach var="i" begin="1" end="${numberOfPages}">
-                                <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                    <a class="page-link" href="manageproducts?pageNumber=${i}&search=${currentKeyword}&category=${currentCategoryId}">${i}</a>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <li>
+                                                <a class="page-link" href="#">...</a>
+                                            </li>
+                                            <c:forEach begin="${param.pageNumber-2}" end="${param.pageNumber+2}" var="i">
+                                                <li class="page-item ${i==param.pageNumber?"active":""}">
+                                                    <a class="page-link" href="<%=request.getContextPath()%>/manageproducts?pageNumber=${i}">${i}</a>
+                                                </li>
+                                            </c:forEach>
+                                            <li>
+                                                <a class="page-link" href="#">...</a>
+                                            </li>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:if>
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="<%=request.getContextPath()%>/manageproducts?pageNumber=${(param.pageNumber+1)>requestScope.numberOfPage?1:(param.pageNumber+1)}"
+                                       aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
                                 </li>
-                            </c:forEach>
-                        </ul>
-                        <!-- Blank End -->
+                                <li class="page-item"><a class="page-link" href="<%=request.getContextPath()%>/manageproducts?pageNumber=${numberOfPage}">End</a></li>
+                            </ul>
+                        </nav>
                     </div>
                 </div>
                 <%@include file="../HeadFoot/EmployeeFooter.jsp" %>
             </div>
-            <!--<a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>-->
-            <button class="btn btn-lg btn-primary btn-lg-square back-to-top d-none" id="back-to-top" onclick="window.scrollTo({top: 0, left: 0, behavior: 'smooth'});"><i class="bi bi-arrow-up"></i></button>
+            <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
         </div>
         <!-- JavaScript Libraries -->
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -490,114 +508,59 @@
         <!-- Template Javascript -->
         <script src="js/main.js"></script> 
         <script>
-                document.addEventListener("DOMContentLoaded", function () {
-                    // Định dạng số khi nhập liệu
-                    function formatNumber(input) {
-                        let value = input.value.replace(/\D/g, '');
-                        input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                    }
+                                                                                document.addEventListener("DOMContentLoaded", function () {
+                                                                                    // Định dạng số khi nhập liệu
+                                                                                    function formatNumber(input) {
+                                                                                        let value = input.value.replace(/\D/g, '');
+                                                                                        input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                                                                                    }
 
-                    // Xử lý submit form
-                    function handleSubmit(event) {
-                        // Lấy giá trị từ input và loại bỏ dấu chấm
-                        let priceInput = document.getElementById('price');
-                        let quantityInput = document.getElementById('quantity');
-                        let priceValue = priceInput.value.replace(/\./g, '');
-                        let quantityValue = quantityInput.value.replace(/\./g, '');
+                                                                                    // Xử lý submit form
+                                                                                    function handleSubmit(event) {
+                                                                                        // Lấy giá trị từ input và loại bỏ dấu chấm
+                                                                                        let priceInput = document.getElementById('price');
+                                                                                        let quantityInput = document.getElementById('quantity');
+                                                                                        let priceValue = priceInput.value.replace(/\./g, '');
+                                                                                        let quantityValue = quantityInput.value.replace(/\./g, '');
 
-                        // Đặt lại giá trị không có dấu chấm vào input trước khi submit
-                        priceInput.value = priceValue;
-                        quantityInput.value = quantityValue;
-                    }
+                                                                                        // Đặt lại giá trị không có dấu chấm vào input trước khi submit
+                                                                                        priceInput.value = priceValue;
+                                                                                        quantityInput.value = quantityValue;
+                                                                                    }
 
-                    // Gắn sự kiện cho form và input
-                    let form = document.getElementById('add-form');
-                    form.addEventListener('submit', handleSubmit);
+                                                                                    // Gắn sự kiện cho form và input
+                                                                                    let form = document.getElementById('add-form');
+                                                                                    form.addEventListener('submit', handleSubmit);
 
-                    let priceInput = document.getElementById('price');
-                    priceInput.addEventListener('input', function () {
-                        formatNumber(priceInput);
-                    });
+                                                                                    let priceInput = document.getElementById('price');
+                                                                                    priceInput.addEventListener('input', function () {
+                                                                                        formatNumber(priceInput);
+                                                                                    });
 
-                    let quantityInput = document.getElementById('quantity');
-                    quantityInput.addEventListener('input', function () {
-                        formatNumber(quantityInput);
-                    });
-                });
+                                                                                    let quantityInput = document.getElementById('quantity');
+                                                                                    quantityInput.addEventListener('input', function () {
+                                                                                        formatNumber(quantityInput);
+                                                                                    });
+                                                                                });
+                                                                                function previewImage(input, imgElementId, removeButtonId) {
+                                                                                    const file = input.files[0];
+                                                                                    if (file) {
+                                                                                        const reader = new FileReader();
+                                                                                        reader.onload = function (e) {
+                                                                                            document.getElementById(imgElementId).src = e.target.result;
+                                                                                            document.getElementById(imgElementId).style.display = 'block';
+                                                                                            document.getElementById(removeButtonId).style.display = 'inline';
+                                                                                        };
+                                                                                        reader.readAsDataURL(file);
+                                                                                    }
+                                                                                }
 
-// Hiển thị ảnh xem trước
-                document.getElementById("addRepresentImage").addEventListener("change", function (e) {
-                    const file = e.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function (event) {
-                            const preview = document.getElementById("preview");
-                            preview.src = event.target.result;
-                            preview.style.display = "block";
-                            document.getElementById("removeImage").style.display = "block";
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                });
-
-                function validateFileType(fileInputId) {
-                    const fileInput = document.getElementById(fileInputId);
-                    const filePath = fileInput.value;
-                    const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
-
-                    if (!allowedExtensions.exec(filePath)) {
-                        alert('Only accept image files (jpg, jpeg, png, gif).');
-                        fileInput.value = '';
-                        return false;
-                    }
-                }
-
-                function removeSelectedImage() {
-                    const preview = document.getElementById("preview");
-                    const fileInput = document.getElementById("addRepresentImage");
-                    preview.src = '<%=request.getContextPath()%>/Image/emty_image.jpg';
-                    fileInput.value = '';
-                    document.getElementById("removeImage").style.display = "none";
-                }
-
-                document.addEventListener("DOMContentLoaded", function () {
-                    // Validate file type and show preview
-                    function validateFileType(fileInputId, previewId, removeButtonId) {
-                        const fileInput = document.getElementById(fileInputId);
-                        const filePath = fileInput.value;
-                        const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
-
-                        if (!allowedExtensions.exec(filePath)) {
-                            alert('Only accept image files (jpg, jpeg, png, gif).');
-                            fileInput.value = '';
-                            document.getElementById(previewId).src = `Image/Products/${fileInput.getAttribute('data-existing-image')}`;
-                            document.getElementById(removeButtonId).style.display = "none";
-                            return false;
-                        } else {
-                            if (fileInput.files && fileInput.files[0]) {
-                                const reader = new FileReader();
-                                reader.onload = function (e) {
-                                    document.getElementById(previewId).src = e.target.result;
-                                    document.getElementById(removeButtonId).style.display = "block";
-                                };
-                                reader.readAsDataURL(fileInput.files[0]);
-                            }
-                        }
-                    }
-
-                    // Remove selected image and reset input
-                    function removeSelectedImageEdit(productId) {
-                        const preview = document.getElementById(`previewEdit${productId}`);
-                        const fileInput = document.getElementById(`editRepresentImage${productId}`);
-                        preview.src = `Image/Products/${fileInput.getAttribute('data-existing-image')}`;
-                        fileInput.value = '';
-                        document.getElementById(`removeImageEdit${productId}`).style.display = "none";
-                    }
-
-                    window.validateFileType = validateFileType;
-                    window.removeSelectedImageEdit = removeSelectedImageEdit;
-                });
-
+                                                                                function removeImage(imgElementId, removeButtonId, inputFileId, originalSrc) {
+                                                                                    document.getElementById(imgElementId).src = originalSrc;
+                                                                                    document.getElementById(imgElementId).style.display = 'block';
+                                                                                    document.getElementById(removeButtonId).style.display = 'none';
+                                                                                    document.getElementById(inputFileId).value = '';
+                                                                                }
         </script>
 
         <!-- Bootstrap JS -->

@@ -14,12 +14,13 @@ import model.Serial_number;
  *
  * @author admin
  */
-public class Serial_numberDAO extends DBContext{
-    private ArrayList<Serial_number> get(String value){
+public class Serial_numberDAO extends DBContext {
+
+    private ArrayList<Serial_number> get(String value) {
         ArrayList<Serial_number> list = new ArrayList<>();
         try {
             String sql = "select * from serial_number";
-            if(value!=null&&!value.isBlank()){
+            if (value != null && !value.isBlank()) {
                 sql += " where " + value;
             }
             PreparedStatement pt = connection.prepareStatement(sql);
@@ -35,16 +36,39 @@ public class Serial_numberDAO extends DBContext{
         }
         return list;
     }
-    public ArrayList<Serial_number> getAll(){
-               return get(null);
+
+    public ArrayList<Serial_number> getAll() {
+        return get(null);
     }
-    public ArrayList<Serial_number> getAllByProductId(int id){
-        return get("product_id="+id);
+
+    public void add(Serial_number temp) {
+        try {
+            String sql = """
+                         INSERT INTO [dbo].[serial_number]
+                                    ([sn]
+                                    ,[product_id]
+                                    ,[sn_status])
+                              VALUES
+                                    (?,?,?)""";
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setString(1, temp.getSn());
+            st.setInt(2, temp.getProduct_id());
+            st.setInt(3, 1);
+            st.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
-    public ArrayList<Serial_number> getAllByProductIdAndStatus(int id, int status){
-        return get("product_id="+id+" and sn_status=" + status);
+
+    public ArrayList<Serial_number> getAllByProductId(int id) {
+        return get("product_id=" + id);
     }
-    private Serial_number getByRS(ResultSet rs) throws SQLException{
+
+    public ArrayList<Serial_number> getAllByProductIdAndStatus(int id, int status) {
+        return get("product_id=" + id + " and sn_status=" + status);
+    }
+
+    private Serial_number getByRS(ResultSet rs) throws SQLException {
         return new Serial_number(
                 rs.getInt("id"),
                 rs.getString("sn"),
@@ -52,7 +76,8 @@ public class Serial_numberDAO extends DBContext{
                 rs.getInt("sn_status")
         );
     }
-    public void updateStatus(int id, int status){
+
+    public void updateStatus(int id, int status) {
         try {
             String sql = "update serial_number set sn_status=? where id=?";
             PreparedStatement pt = connection.prepareStatement(sql);
@@ -64,7 +89,8 @@ public class Serial_numberDAO extends DBContext{
             System.out.println(a.getMessage());
         }
     }
-    public ArrayList<Serial_number> getByOrderID(int id){
+
+    public ArrayList<Serial_number> getByOrderID(int id) {
         ArrayList<Serial_number> list = new ArrayList<>();
         try {
             String sql = "select sn.id, sn.product_id, sn.sn, sn.sn_status from serial_number sn join order_detail od on sn.id=od.serial_number_id join [order] o on o.id = od.order_id where o.id=?";
@@ -82,8 +108,9 @@ public class Serial_numberDAO extends DBContext{
         }
         return list;
     }
+
     public static void main(String[] args) {
-        ArrayList<Serial_number> p = new Serial_numberDAO().getAllByProductIdAndStatus(1,1);
+        ArrayList<Serial_number> p = new Serial_numberDAO().getAllByProductIdAndStatus(1, 1);
         System.out.println(p);
     }
 }

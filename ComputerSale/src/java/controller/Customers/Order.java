@@ -70,7 +70,7 @@ public class Order extends HttpServlet {
             new OrderDAO().updateStatus(3, 0, orderID);
             ArrayList<Serial_number> temp = new Serial_numberDAO().getByOrderID(orderID);
             for (Serial_number i : temp) {
-                new Serial_numberDAO().updateStatus(i.getId(), 1);
+                new Serial_numberDAO().updateStatus(i.getId(), 2);
             }
             session.removeAttribute("orderID");
         } catch (Exception e) {

@@ -52,11 +52,11 @@ public class Login extends HttpServlet {
             return;
         }
         Employee eTemp = new EmployeeDAO().checkLogin(username, password);
-        if (eTemp != null) {
+        if (eTemp != null && eTemp.getStatus()==1) {
             session.setAttribute("currentEmployee", eTemp);
             switch (eTemp.getRole_id()) {
-                case 3 ->
-                    response.sendRedirect("viewstatistic");
+                case 1 ->
+                    response.sendRedirect("employeehome");
                 case 2 ->
                     response.sendRedirect("employeehome");
                 default ->

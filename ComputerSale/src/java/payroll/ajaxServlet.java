@@ -27,6 +27,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Cart;
 import model.Customer;
+import model.Order;
 import model.Serial_number;
 
 /**
@@ -63,11 +64,12 @@ public class ajaxServlet extends HttpServlet {
             String vnp_Version = "2.1.0";
             String vnp_Command = "pay";
             String orderType = "other";
-            long amount = Integer.parseInt(req.getParameter("amount")) * 100;
-            amount *= 25000;
+            long amount = Integer.parseInt(req.getParameter("amount"));
+            amount*=100;
+            System.out.println(amount);
             String bankCode = req.getParameter("bankCode");
-            
-            String vnp_TxnRef = Config.getRandomNumber(6);
+            ArrayList<Order> oTemp = new OrderDAO().getAllOrders();
+            String vnp_TxnRef = (oTemp.get(oTemp.size()-1).getId()+1)+"";
             String vnp_IpAddr = Config.getIpAddress(req);
             
             String vnp_TmnCode = Config.vnp_TmnCode;
@@ -85,7 +87,7 @@ public class ajaxServlet extends HttpServlet {
                 vnp_Params.put("vnp_BankCode", "");
             }
             vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-            vnp_Params.put("vnp_OrderInfo", "swp391_se1812_group5:" + vnp_TxnRef);
+            vnp_Params.put("vnp_OrderInfo", "SWP391 SE1812 Group5 Order ID:" + vnp_TxnRef);
             vnp_Params.put("vnp_OrderType", orderType);
             
             String locate = req.getParameter("language");

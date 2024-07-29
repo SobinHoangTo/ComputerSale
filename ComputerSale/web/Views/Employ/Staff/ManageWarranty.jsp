@@ -109,11 +109,12 @@
                                             <td style="width: 15%;">${list.get(list.size()-i).get(2)}</td>
                                             <td style="width: 35%;" class="scrollable-cell">${list.get(list.size()-i).get(3)}</td>
                                             <td style="width: 15%">
-                                                <form action="managewarranty" method="post" style="display: inline;">
+                                                <form action="updatewarranty" method="post" style="display: inline;">
+                                                    <input type="hidden" name="id" value="${list.get(list.size()-i).get(0)}">
                                                     <div class="input-group">
                                                         <select class="form-select form-select-sm" id="status" name="status">
-                                                            <option value="1" >Accept</option>
-                                                            <option value="0" >Reject</option>
+                                                            <option value="2" >Accept</option>
+                                                            <option value="3" >Reject</option>
                                                         </select>
                                                         <button type="submit" name="action" class="btn btn-sm btn-primary">
                                                             <i class="bi bi-arrow-repeat"></i>
@@ -149,7 +150,7 @@
                                             </div>
                                             <div class="modal-body card">
                                                 <div class="card">
-                                                    <div class="container form-container" style="padding: 5%:"> 
+                                                    <div class="container form-container" style="padding: 5%"> 
                                                         <div class="header" style=" margin-bottom: 5px;">
                                                             <div class="title">
                                                                 <h1 style="margin: 0; color: crimson; border-bottom: 2px solid crimson;">PHIẾU BẢO HÀNH</h1>

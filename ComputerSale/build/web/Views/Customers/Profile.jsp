@@ -61,7 +61,7 @@
                 <div class="row align-items-center">
                     <div class="col-md-12 col-lg-5 mb-5 text-center">
                         <div class="image-container">
-                            <img id="profileImage" src="Image/Customers/${requestScope.img}" alt="Profile Image" class="img-fluid rounded" style="max-height: 259px;">
+                            <img id="profileImage" src="Image/Avatar/Customer/${requestScope.img}" alt="${requestScope.img}" class="img-fluid rounded" height="259px" width="259px" style="border: 1px solid #555;">
                             <button id="removeImageButton" class="remove-image-button" style="display: none;">&times;</button>
                         </div>
                     </div>
@@ -110,6 +110,7 @@
                             <c:if test="${not empty param.mess}">
                                 <div class="alert alert-${param.alertType} col-sm-10" role="mess">
                                     ${param.mess}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             </c:if>
                         </div>
@@ -142,10 +143,10 @@
                         <form action="profile" method="Post" enctype="multipart/form-data">
                             <input type="hidden" name="action" value="edit">
                             <div class="mb-3 row">
-                                <label for="detailImages" class="col-sm-4 col-form-label text-end"><b>Avatar</b><span class="text-danger">(*)</span></label><br/>
+                                <label for="detailImages" class="col-sm-4 col-form-label text-end"><b>Avatar</b></label><br/>
                                 <div class="col-sm-8">
                                     <div class="image-container">
-                                        <img id="editProfileImage" src="Image/Customers/${requestScope.img}" alt="Profile Image" class="img-fluid rounded" style="max-height: 259px;">
+                                        <img id="editProfileImage" src="Image/Avatar/Customer/${requestScope.img}" alt="Profile Image" class="img-fluid rounded" height="259px" width="259px" style="border: 1px solid #555;">
                                         <button type="button" id="editRemoveImageButton" class="remove-image-button" style="display: none;">&times;</button>
                                     </div>
                                     <input type="hidden" name="existingImg" value="${requestScope.img}">
@@ -168,7 +169,7 @@
                             <div class="mb-3 row">
                                 <label class="col-sm-4 col-form-label text-end"><b>Email</b></label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" type="email" name="email" value="${requestScope.email}">
+                                    <input class="form-control" type="email" name="email" value="${requestScope.email}" disabled>
                                 </div>
                             </div>
                             <div class="mb-3 row">
@@ -267,13 +268,13 @@
 
             document.getElementById("removeImageButton").addEventListener("click", function () {
                 const profileImage = document.getElementById("profileImage");
-                profileImage.src = 'Image/Customers/${requestScope.img}';
+                profileImage.src = 'Image/Avatar/Customer/${requestScope.img}';
                 this.style.display = "none";
             });
 
             document.getElementById("editRemoveImageButton").addEventListener("click", function () {
                 const profileImage = document.getElementById("editProfileImage");
-                profileImage.src = 'Image/Customers/${requestScope.img}';
+                profileImage.src = 'Image/Avatar/Customer/${requestScope.img}';
                 document.getElementById("editImageUpload").value = '';
                 this.style.display = "none";
             });

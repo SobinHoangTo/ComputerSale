@@ -31,7 +31,7 @@ public class ManageAccount extends HttpServlet {
             throws ServletException, IOException {
 //        processRequest(request, response);
         String searchQuery = request.getParameter("search");
-        String roleQuery = request.getParameter("role");
+        String roleQuery = request.getParameter("roleSearch");
         HttpSession session = request.getSession();
         ArrayList<Employee> searchResults = (ArrayList<Employee>) session.getAttribute("eList");
         EmployeeDAO dao = new EmployeeDAO();
@@ -55,8 +55,11 @@ public class ManageAccount extends HttpServlet {
             if (!results.isEmpty()) {
                 searchResults = results;
                 session.setAttribute("eList", searchResults);
+                MyUtils.setAlertAttributes(request, true, "found " + searchResults.size() + " of '" + searchQuery + "'");
             } else {
-                searchResults = new ArrayList<>(); // No results found, empty the list
+                // No results found, empty the list
+                session.removeAttribute("eList");
+                MyUtils.setAlertAttributes(request, false, "search " + searchQuery);
             }
         }
 
@@ -72,10 +75,9 @@ public class ManageAccount extends HttpServlet {
                 }
                 if (!roleResults.isEmpty()) {
                     searchResults = roleResults;
-                }else if (roleId==0) {
+                } else if (roleId == 0) {
                     searchResults = dao.getAll();
-                }
-                else {
+                } else {
                     searchResults = new ArrayList<>(); // No results found, empty the list
                 }
             } catch (NumberFormatException e) {
@@ -85,12 +87,12 @@ public class ManageAccount extends HttpServlet {
                 searchResults = new ArrayList<>(); // No valid results, empty the list
             }
         }
-
+        System.out.println("print here");
 // If searchResults is still null or empty, return all employees
         if (searchResults.isEmpty()) {
             searchResults = dao.getAll();
             session.setAttribute("eList", searchResults);
-            MyUtils.setAlertAttributes(request, isSearchQueryProvided, roleQuery);
+            MyUtils.setAlertAttributes(request, false, searchQuery + roleQuery);
         }
 
 // Handle pagination
@@ -112,51 +114,65 @@ public class ManageAccount extends HttpServlet {
             throws ServletException, IOException {
 //        processRequest(request, response);
         String idParam = request.getParameter("id");
-        if (idParam != null && !idParam.isEmpty()) {
+        String action = request.getParameter("action");
+
+        if (idParam == null && idParam.isEmpty()) {
+            // Handling when ID parameter is present (for search or initial load)
+            MyUtils.setAlertAttributes(request, false, "Searching ID " + idParam);
+            doGet(request, response); // Assuming doGet method handles initial data retrieval
+        } else {
+            // Handling actions based on the 'action' parameter
+            boolean status = false;
             try {
-                int id = Integer.parseInt(idParam);
-                String role = request.getParameter("role");
+                int id = Integer.parseInt(idParam); // Parse ID to integer
+                EmployeeDAO employeeDAO = new EmployeeDAO(); // Instantiate DAO object
 
-                // Convert role to role_id
-                int roleId = switch (role) {
-                    case "2" ->
-                        2;
-                    case "1" ->
-                        1;
-                    default ->
-                        3;
-                };
+                switch (action) {
+                    case "updateRole":
+                        // Updating employee role
+                        String role = request.getParameter("role");
+                        int roleId = switch (role) {
+                            case "2" ->
+                                2; // Manager
+                            case "1" ->
+                                1; // Admin
+                            default ->
+                                3; // Staff (default)
+                        };
+                        status = employeeDAO.updateEmployeeRole(id, roleId);
+                        break;
 
-                // Update the employee role in the database
-                EmployeeDAO employeeDAO = new EmployeeDAO();
-                boolean isUpdated = employeeDAO.updateEmployeeRole(id, roleId);
+                    case "active":
+                        // Setting employee status to active (1)
+                        status = employeeDAO.updateEmployeeStatus(id, 1);
+                        break;
 
-                // Set an attribute for the result message
-                if (isUpdated) {
-                    request.setAttribute("alertMessage", "Role updated successfully!");
-                    request.setAttribute("alertType", "success");
-                } else {
-                    request.setAttribute("alertMessage", "Failed to update the role.");
-                    request.setAttribute("alertType", "danger");
+                    case "inactive":
+                        // Setting employee status to inactive (0)
+                        status = employeeDAO.updateEmployeeStatus(id, 0);
+                        break;
+
+                    default:
+                        throw new AssertionError("Invalid action: " + action);
+                }
+
+                if (status) {
+                    // Refreshing data after successful update
+                    HttpSession session = request.getSession();
+                    session.removeAttribute("eList"); // Remove cached employee list
                 }
             } catch (NumberFormatException ex) {
-                // Handle the case where the ID parameter is not a valid integer
+                // Handling invalid ID format
                 request.setAttribute("alertMessage", "Invalid ID format.");
                 request.setAttribute("alertType", "danger");
             }
-        } else {
-            // Handle the case where the ID parameter is null or empty
-            request.setAttribute("alertMessage", "ID parameter is missing.");
-            request.setAttribute("alertType", "danger");
+
+            // Setting alert message based on action performed
+            MyUtils.setAlertAttributes(request, status, action + " account ID: " + idParam);
+            // Forwarding to doGet to refresh page with updated data or error message
+            doGet(request, response);
         }
 
-        // Forward to the management page to display the result message
-        doGet(request, response);
     }
-
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
 
 }

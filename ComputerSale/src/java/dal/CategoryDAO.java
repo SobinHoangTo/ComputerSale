@@ -45,6 +45,31 @@ public class CategoryDAO extends DBContext {
         return get(null);
     }
 
+    public ArrayList<Category> getAvailiable(String value) {
+        ArrayList<Category> list = new ArrayList<>();
+        try {
+            String sql = "select * from category where status=1";
+            if (value != null && !value.isBlank()) {
+                sql += " and " + value;
+            }
+            PreparedStatement pt = connection.prepareStatement(sql);
+            ResultSet rs = pt.executeQuery();
+            while (rs.next()) {
+                list.add(getByRS(rs));
+            }
+            rs.close();
+            pt.close();
+        } catch (Exception a) {
+            System.out.println(a.getMessage());
+            return null;
+        }
+        return list;
+    }
+
+    public ArrayList<Category> getAllByStatus(int status) {
+        return get("status = 1");
+    }
+    
     public boolean addCategory(String name, int created_by) {
         try {
             String sql = "INSERT INTO [dbo].[category] "
@@ -80,73 +105,6 @@ public class CategoryDAO extends DBContext {
             return false;
         }
         return true;
-    }
-
-    public boolean deleteCategory(int id) {
-        try {
-            connection.setAutoCommit(false); // Bắt đầu giao dịch
-
-            // Xóa các bản ghi trong bảng product_image liên quan đến các sản phẩm thuộc category sẽ bị xóa
-            String sql1 = "DELETE pi FROM [dbo].[product_image] pi "
-                    + "JOIN [dbo].[product] p ON pi.product_id = p.id "
-                    + "WHERE p.category_id = ?";
-            PreparedStatement st1 = connection.prepareStatement(sql1);
-            st1.setInt(1, id);
-            st1.executeUpdate();
-
-            // Xóa các bản ghi trong bảng discount liên quan đến các sản phẩm thuộc category sẽ bị xóa
-            String sql2 = "DELETE d FROM [dbo].[discount] d "
-                    + "JOIN [dbo].[product] p ON d.product_id = p.id "
-                    + "WHERE p.category_id = ?";
-            PreparedStatement st2 = connection.prepareStatement(sql2);
-            st2.setInt(1, id);
-            st2.executeUpdate();
-
-            // Xóa các bản ghi trong bảng serial_number liên quan đến các sản phẩm thuộc category sẽ bị xóa
-            String sql3 = "DELETE sn FROM [dbo].[serial_number] sn "
-                    + "JOIN [dbo].[product] p ON sn.product_id = p.id "
-                    + "WHERE p.category_id = ?";
-            PreparedStatement st3 = connection.prepareStatement(sql3);
-            st3.setInt(1, id);
-            st3.executeUpdate();
-
-            // Xóa các bản ghi trong bảng order_detail liên quan đến các sản phẩm thuộc category sẽ bị xóa
-            String sql4 = "DELETE od FROM [dbo].[order_detail] od "
-                    + "JOIN [dbo].[product] p ON od.product_id = p.id "
-                    + "WHERE p.category_id = ?";
-            PreparedStatement st4 = connection.prepareStatement(sql4);
-            st4.setInt(1, id);
-            st4.executeUpdate();
-
-            // Xóa các sản phẩm chứa category sẽ bị xóa
-            String sql5 = "DELETE FROM [dbo].[product] WHERE category_id = ?";
-            PreparedStatement st5 = connection.prepareStatement(sql5);
-            st5.setInt(1, id);
-            st5.executeUpdate();
-
-            // Cuối cùng, xóa category
-            String sql6 = "DELETE FROM [dbo].[category] WHERE id = ?";
-            PreparedStatement st6 = connection.prepareStatement(sql6);
-            st6.setInt(1, id);
-            st6.executeUpdate();
-
-            connection.commit(); // Kết thúc giao dịch
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            try {
-                connection.rollback(); // Rollback giao dịch nếu có lỗi xảy ra
-            } catch (SQLException rollbackEx) {
-                rollbackEx.printStackTrace();
-            }
-            return false;
-        } finally {
-            try {
-                connection.setAutoCommit(true); // Đặt lại chế độ tự động commit
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
     }
 
     public boolean hiddenCategory(int id) {
@@ -193,9 +151,15 @@ public class CategoryDAO extends DBContext {
             stCategory.setInt(1, id);
             stCategory.executeUpdate();
 
-            String sqlProduct = "UPDATE [dbo].[product]\n"
-                    + "   SET [status] = 1\n"
-                    + " WHERE [category_id] = ?";
+            String sqlProduct = """
+                                UPDATE product 
+                                SET status = 1 
+                                WHERE id IN (
+                                    SELECT p.id 
+                                    FROM product p 
+                                    JOIN brand b ON b.id=p.brand_id
+                                    WHERE b.status = 1
+                                ) and [category_id] = ?""";
             PreparedStatement stProduct = connection.prepareStatement(sqlProduct);
             stProduct.setInt(1, id);
             stProduct.executeUpdate();
@@ -268,50 +232,47 @@ public class CategoryDAO extends DBContext {
 //    }
 //    return listSearch;
 //}
-
-    
     public ArrayList<Category> searchCategoryByKeyWord(String keyword) {
-    ArrayList<Category> listSearch = new ArrayList<>();
-    ArrayList<Category> allCategories = new ArrayList<>();
-    try {
-        // Lấy toàn bộ danh mục từ cơ sở dữ liệu
-        String sql = "SELECT * FROM [dbo].[category]";
-        PreparedStatement pt = connection.prepareStatement(sql);
-        ResultSet rs = pt.executeQuery();
-        while (rs.next()) {
-            allCategories.add(getByRS(rs));
-        }
-        rs.close();
-        pt.close();
-
-        // Chuẩn hóa chuỗi input
-        String normalizedKeyword = keyword.replaceAll("[^a-zA-Z0-9\\s]", "").toLowerCase();
-        
-        // Tách các từ khóa hợp lệ
-        String[] keywords = normalizedKeyword.split("\\s+");
-        ArrayList<String> validKeywords = new ArrayList<>();
-        for (String key : keywords) {
-            if (!key.isBlank() && key.length() > 2) { // Bỏ qua các từ khóa ngắn và trống
-                validKeywords.add(key);
+        ArrayList<Category> listSearch = new ArrayList<>();
+        ArrayList<Category> allCategories = new ArrayList<>();
+        try {
+            // Lấy toàn bộ danh mục từ cơ sở dữ liệu
+            String sql = "SELECT * FROM [dbo].[category]";
+            PreparedStatement pt = connection.prepareStatement(sql);
+            ResultSet rs = pt.executeQuery();
+            while (rs.next()) {
+                allCategories.add(getByRS(rs));
             }
-        }
+            rs.close();
+            pt.close();
 
-        // Tìm kiếm các từ khóa trong danh sách đã tải
-        for (Category category : allCategories) {
-            for (String key : validKeywords) {
-                if (category.getName().toLowerCase().contains(key)) {
-                    listSearch.add(category);
-                    break;  // Nếu đã tìm thấy từ khóa trong danh mục này, chuyển sang danh mục tiếp theo
+            // Chuẩn hóa chuỗi input
+            String normalizedKeyword = keyword.replaceAll("[^a-zA-Z0-9\\s]", "").toLowerCase();
+
+            // Tách các từ khóa hợp lệ
+            String[] keywords = normalizedKeyword.split("\\s+");
+            ArrayList<String> validKeywords = new ArrayList<>();
+            for (String key : keywords) {
+                if (!key.isBlank() && key.length() > 2) { // Bỏ qua các từ khóa ngắn và trống
+                    validKeywords.add(key);
                 }
             }
-        }
-    } catch (Exception a) {
-        System.out.println(a.getMessage());
-        return null;
-    }
-    return listSearch;
-}
 
+            // Tìm kiếm các từ khóa trong danh sách đã tải
+            for (Category category : allCategories) {
+                for (String key : validKeywords) {
+                    if (category.getName().toLowerCase().contains(key)) {
+                        listSearch.add(category);
+                        break;  // Nếu đã tìm thấy từ khóa trong danh mục này, chuyển sang danh mục tiếp theo
+                    }
+                }
+            }
+        } catch (Exception a) {
+            System.out.println(a.getMessage());
+            return null;
+        }
+        return listSearch;
+    }
 
     public static void main(String[] args) {
         System.out.println(new CategoryDAO().getAll());

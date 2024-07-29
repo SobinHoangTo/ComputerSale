@@ -37,7 +37,7 @@ public class RateDAO extends DBContext {
             int id = entry1.getKey();
             Customer cus = entry1.getValue();
             if (cus.getUsername().contains(searchQuery)) {
-                
+
             }
         }
 // Log the size of the results or handle it appropriately
@@ -117,7 +117,8 @@ public class RateDAO extends DBContext {
         return new Rate(rs.getInt("id"),
                 rs.getInt("order_detail_id"),
                 rs.getInt("star_rate"),
-                rs.getString("feedback"));
+                rs.getString("feedback"),
+                rs.getInt("status"));
     }
 
     public ArrayList<Rate> getAll() {
@@ -193,4 +194,25 @@ public class RateDAO extends DBContext {
         }
     }
 
+    public Rate getCommentByOrderDetailId(int orderDetailId) {
+        Rate rate = null;
+        try {
+            String sql = "SELECT * FROM rate WHERE order_detail_id = ?";
+            PreparedStatement pt = connection.prepareStatement(sql);
+            pt.setInt(1, orderDetailId);
+            ResultSet rs = pt.executeQuery();
+
+            if (rs.next()) {
+                rate = new Rate();
+                rate.setId(rs.getInt("id"));
+                rate.setOrder_detail_id(rs.getInt("order_detail_id"));
+                rate.setStar_rate(rs.getInt("star_rate"));
+                rate.setFeedback(rs.getString("feedback"));
+                rate.setStatus(rs.getInt("status"));
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return rate;
+    }
 }

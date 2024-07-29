@@ -1,172 +1,147 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Phiếu Bảo Hành</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 0;
-                padding: 0;
-                background-color: #f8f8f8;
-            }
-
-            .container {
-                width: 80%;
-                margin: 0 auto;
-                padding: 20px;
-                border: 1px solid crimson;
-                border-radius: 10px;
-                background-color: white;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            }
-
-            .header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                border-bottom: 2px solid crimson;
-                padding-bottom: 10px;
-                margin-bottom: 20px;
-            }
-
-            .header .title h1 {
-                margin: 0;
-                color: crimson;
-            }
-
-            .header .date p {
-                margin: 0;
-                color: crimson;
-            }
-
-            .info-section {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 20px;
-            }
-
-            .customer-info, .receiver-info {
-                width: 48%;
-            }
-
-            h2 {
-                margin-top: 0;
-                color: crimson;
-            }
-
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 20px;
-            }
-
-            table, th, td {
-                border: 1px solid crimson;
-            }
-
-            th {
-                background-color: crimson;
-                color: white;
-                padding: 10px;
-                text-align: center;
-            }
-
-            td {
-                padding: 10px;
-                text-align: left;
-            }
-
-            .signature {
-                display: flex;
-                justify-content: space-between;
-                margin-top: 40px;
-            }
-
-            .signature div {
-                text-align: center;
-                width: 45%;
-            }
-
-            .signature p {
-                padding-bottom: 100px;
-                color: crimson;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <div class="title">
-                    <h1>PHIẾU BẢO HÀNH</h1>
-                </div>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Phiếu Bảo Hành</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f8f8;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid crimson;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            border-bottom: 2px solid crimson;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .header .title h1 {
+            margin: 0;
+            color: crimson;
+        }
+        .info-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .info-column {
+            width: 48%; /* Adjust width as needed */
+        }
+        h2 {
+            margin-top: 0;
+            color: crimson;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border: 1px solid crimson;
+        }
+        th, td {
+            border: 1px solid crimson;
+            padding: 10px;
+            text-align: center;
+        }
+        .signature {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature .customer-signature, .signature .receiver-signature {
+            width: 48%; /* Adjust width as needed */
+            text-align: center;
+        }
+        .signature p {
+            margin-bottom: 20px; /* Adjust spacing between signatures */
+            color: crimson;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">
+                <h1>PHIẾU BẢO HÀNH</h1>
             </div>
+        </div>
 
-            <div class="info-section">
+        <div class="info-section">
+            <div class="info-column">
                 <div class="receiver-info">
                     <h2>THÔNG TIN NGƯỜI TIẾP NHẬN</h2>
                     <p>Tên nv: {employeeName}</p>
-                    <p>Số điện thoại liên hệ: {hotline}</p><hr/>
+                    <p>Số điện thoại liên hệ: {hotline}</p>
+                    <hr/>
                     <p>Ngày nhận đơn: {receivedDate}</p>
                     <p>Ngày hẹn trả (dự kiến): {expectedDate}</p>
                 </div>
+            </div>
 
+            <div class="info-column">
                 <div class="customer-info">
                     <h2>THÔNG TIN KHÁCH HÀNG</h2>
                     <p>Tên KH: {customerName}</p>
                     <p>Điện thoại: {customerPhone}</p>
                 </div>
-
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 5%;">STT</th>
-                        <th style="width: 10%;">Mã SP</th>
-                        <th style="width: 35%;">Tên SP</th>
-                        <th style="width: 15%;">Tình trạng SP</th>
-                        <th style="width: 15%;">Hạn bảo hành</th>
-                        <th style="width: 20%;">Hình thức</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {productList}
-                    <tr>
-                        <td style="text-align: center;">2</td>
-                        <td>832SW1</td>
-                        <td>Laptop Asus TUF Gaming A15</td>
-
-                        <td>Nguyên vẹn</td>
-                        <td style="text-align: center;">12</td>
-                        <td>Trong thời hạn</td>
-                    </tr>
-                </tbody>
-            </table>
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>Ảnh SP</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Danh sách ảnh ở đây</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="signature">
-                <div class="customer-signature">
-                    <p>Khách hàng</p>
-                    <p>Ký ghi rõ họ tên</p>
-                </div>
-                <div class="receiver-signature">
-                    <p>Nhân viên tiếp nhận</p>
-                </div>
             </div>
         </div>
-    </body>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 5%;">STT</th>
+                    <th style="width: 10%;">Mã SP</th>
+                    <th style="width: 35%;">Tên SP</th>
+                    <th style="width: 15%;">Tình trạng SP</th>
+                    <th style="width: 15%;">Hạn bảo hành</th>
+                    <th style="width: 20%;">Hình thức</th>
+                </tr>
+            </thead>
+            <tbody>
+                {productList}
+                <tr>
+                    <td style="text-align: center;">2</td>
+                    <td>832SW1</td>
+                    <td>Laptop Asus TUF Gaming A15</td>
+                    <td>Nguyên vẹn</td>
+                    <td style="text-align: center;">12</td>
+                    <td>Trong thời hạn</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Ảnh SP</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Danh sách ảnh ở đây</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="signature">
+            <div class="customer-signature">
+                <p>Khách hàng</p>
+                <p>Ký ghi rõ họ tên</p>
+            </div>
+            <div class="receiver-signature">
+                <p>Nhân viên tiếp nhận</p>
+            </div>
+        </div>
+    </div>
+</body>
 </html>
-<td>2</td>

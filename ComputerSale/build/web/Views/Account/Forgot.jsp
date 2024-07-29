@@ -4,11 +4,12 @@
     Author     : Admin
 --%>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="icon" href="Image/laptop-icon.png" type="image/x-icon">
+        <link rel="icon" href="<%=request.getContextPath()%>/Image/laptop-icon.png" type="image/x-icon">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Forgot password</title>
         <!--bootstrap link-->
@@ -22,7 +23,7 @@
         <meta content="" name="description">
 
         <!-- Favicon -->
-        <link href="img/favicon.ico" rel="icon">
+        <link href="<%=request.getContextPath()%>/img/favicon.ico" rel="icon">
 
         <!-- Google Web Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,8 +35,8 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
         <!-- Libraries Stylesheet -->
-        <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
-        <link href="lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+        <link href="<%=request.getContextPath()%>/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+        <link href="<%=request.getContextPath()%>/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
 
         <!-- Customized Bootstrap Stylesheet -->
         <link href="cssE/bootstrap.min.css" rel="stylesheet">
@@ -50,29 +51,24 @@
                 <div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4">
                     <div class="bg-white rounded p-4 p-sm-5 my-4 mx-3">
                         <div class="d-flex align-items-center justify-content-between mb-3">
-                           <a href="<%=request.getContextPath()%>/home" >
-                                <img title="Back to Home" src="../../Image/laptop-icon.png" alt="Logo" class="img-fluid rounded" style="max-height: 100px;">
+                            <a href="<%=request.getContextPath()%>/home" >
+                                <img title="Back to Home" src="<%=request.getContextPath()%>/Image/laptop-icon.png" alt="Logo" class="img-fluid rounded" style="max-height: 100px;">
                             </a>
                             <h3>Forgot Password</h3>
                         </div>
-
-                        <form action="forgotpass">
-
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" id="email" placeholder="Email" required>
-                                <label for="email">Email</label>
-                                <div class="text-end">
-                                    <a href="#" 
-                                       >Send code</a>
+                        <form action="<%=request.getContextPath()%>/forgetpassword" method="post">
+                            <c:if test="${requestScope.error!=null}">
+                                <div class="form-group">
+                                    <div class="alert alert-warning" role="alert">
+                                        ${requestScope.error}
+                                    </div>
                                 </div>
+                            </c:if>
+                            <div class="form-floating mb-3">
+                                <input type="text" name="email" class="form-control" id="email" placeholder="Email" required>
+                                <label for="email">Email</label>
                             </div>
-
-                            <div class="form-floating mb-4">
-                                <input type="number" class="form-control" id="confirmcode" placeholder="Confirmation code" required>
-                                <label for="password">Confirm code</label>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary py-3 w-100 mb-4">Confirm</button>
+                            <button type="submit" class="btn btn-primary py-3 w-100 mb-4">Send New Password</button>
                         </form>
 
                         <p class="text-center mb-0"><a href="<%=request.getContextPath()%>/login">Back to Login</a></p>

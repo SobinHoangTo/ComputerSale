@@ -97,7 +97,7 @@
 
                                                     <tr>
                                                         <td class="text-black font-weight-bold"><strong>Order Total</strong></td>
-                                                        <td class="text-black font-weight-bold"><strong>$${requestScope.totalPrice}</strong></td>
+                                                        <td class="text-black font-weight-bold"><strong>${requestScope.totalPrice}VNĐ</strong></td>
                                                     </tr>
                                                 </tbody>
                                             </table>

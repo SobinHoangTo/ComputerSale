@@ -5,7 +5,7 @@
     <head>
         <link rel="icon" href="Image/laptop-icon.png" type="image/x-icon">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Manage Account</title>
+        <title>Employee Home</title>
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
         <meta content="" name="keywords">
         <meta content="" name="description">
@@ -59,46 +59,52 @@
                 <!-- Content Start -->
                 <div class="container-fluid pt-4 px-4">
                     <div class="row g-4">
-                        <div class="col-sm-12 col-xl-6">
-                            <div class="bg-light rounded h-100">
-                                <div class="card bg-light h-100">
-                                    <div class="card-body">
-                                        <h5 class="card-title">View statistic</h5>
-                                        <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin nec lorem nec velit facilisis fringilla.</p>
-                                        <a href="<%=request.getContextPath()%>/viewstatistic" class="btn btn-primary">View statistics</a>
+                        <c:if test="${sessionScope.currentEmployee.getRole_id()==1}">
+                            <div class="col-sm-12 col-xl-6">
+                                <div class="bg-light rounded h-100">
+                                    <div class="card bg-light h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title">View Statistic</h5>
+                                            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin nec lorem nec velit facilisis fringilla.</p>
+                                            <a href="<%=request.getContextPath()%>/viewstatistic" class="btn btn-primary">View Statistics</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-sm-12 col-xl-6">
-                            <div class="bg-light rounded h-100">
-                                <div class="card bg-light h-100">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Manage Account</h5>
-                                        <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin nec lorem nec velit facilisis fringilla.</p>
-                                        <a href="<%=request.getContextPath()%>/manageaccount" class="btn btn-primary">Go to Account Management</a>
+                        </c:if>
+
+                        <c:if test="${sessionScope.currentEmployee.getRole_id()==2||sessionScope.currentEmployee.getRole_id()==1}">
+                            <div class="col-sm-12 col-xl-6">
+                                <div class="bg-light rounded h-100">
+                                    <div class="card bg-light h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Manage Account</h5>
+                                            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin nec lorem nec velit facilisis fringilla.</p>
+                                            <a href="<%=request.getContextPath()%>/manageaccount" class="btn btn-primary">Go to Account Management</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-sm-12 col-xl-6">
-                            <div class="bg-light rounded h-100">
-                                <div class="card bg-light h-100">
-                                    <div class="card-body">
-                                        <h5 class="card-title">New Account</h5>
-                                        <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin nec lorem nec velit facilisis fringilla.</p>
-                                        <a href="<%=request.getContextPath()%>/" class="btn btn-primary">Go to create new account</a>
+                            <div class="col-sm-12 col-xl-6">
+                                <div class="bg-light rounded h-100">
+                                    <div class="card bg-light h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Create New Account</h5>
+                                            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin nec lorem nec velit facilisis fringilla.</p>
+                                            <a href="<%=request.getContextPath()%>/addemployee" class="btn btn-primary">Go to Create New Account</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </c:if>
+
                         <div class="col-sm-12 col-xl-6">
                             <div class="bg-light rounded h-100">
                                 <div class="card bg-light h-100">
                                     <div class="card-body">
                                         <h5 class="card-title">Staff History</h5>
                                         <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin nec lorem nec velit facilisis fringilla.</p>
-                                        <a href="<%=request.getContextPath()%>/" class="btn btn-primary">Go to Staff History</a>
+                                        <a href="<%=request.getContextPath()%>/staffhistory" class="btn btn-primary">Go to Staff History</a>
                                     </div>
                                 </div>
                             </div>
@@ -129,7 +135,7 @@
                             <div class="bg-light rounded h-100">
                                 <div class="card bg-light h-100">
                                     <div class="card-body">
-                                        <h5 class="card-title">Manage Product</h5>
+                                        <h5 class="card-title">Manage Products</h5>
                                         <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin nec lorem nec velit facilisis fringilla.</p>
                                         <a href="<%=request.getContextPath()%>/manageproducts" class="btn btn-primary">Go to Product Management</a>
                                     </div>
@@ -173,17 +179,6 @@
                             <div class="bg-light rounded h-100">
                                 <div class="card bg-light h-100">
                                     <div class="card-body">
-                                        <h5 class="card-title">Manage Brand</h5>
-                                        <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin nec lorem nec velit facilisis fringilla.</p>
-                                        <a href="<%=request.getContextPath()%>/managebrand" class="btn btn-primary">Go to Brand Management</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12 col-xl-6">
-                            <div class="bg-light rounded h-100">
-                                <div class="card bg-light h-100">
-                                    <div class="card-body">
                                         <h5 class="card-title">Manage Warranty</h5>
                                         <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin nec lorem nec velit facilisis fringilla.</p>
                                         <a href="<%=request.getContextPath()%>/managewarranty" class="btn btn-primary">Go to Warranty Management</a>
@@ -191,10 +186,9 @@
                                 </div>
                             </div>
                         </div>
-
-
                     </div>
                 </div>
+
                 <!-- Content End -->
 
 

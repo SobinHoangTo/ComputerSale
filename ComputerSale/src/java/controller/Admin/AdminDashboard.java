@@ -64,7 +64,7 @@ public class AdminDashboard extends HttpServlet {
         newChart.put("'Other'", otherData);
         request.setAttribute("category", newChart.keySet());
         request.setAttribute("chartData", newChart.values());
-        
+        request.setAttribute("productRateList", new DAOJoin().getProductRate());
         request.setAttribute("orderList", new DAOJoin().getOrderAdminStatistic());
         request.setAttribute("todaySold", new DAOJoin().getNumberProductSoldByDay(LocalDate.now().toString()));
         request.setAttribute("totalSold", new DAOJoin().getTotalNumberProductSold());

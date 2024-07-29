@@ -5,6 +5,7 @@
 
 package controller.Customers;
 
+import dal.ProductDAO;
 import dal.Serial_numberDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -15,6 +16,7 @@ import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.HashMap;
 import model.Cart;
+import model.Product;
 import model.Serial_number;
 
 /**
@@ -30,47 +32,58 @@ public class Checkout extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        String[] idChecked = request.getParameterValues("check");
-        HashMap<Integer, Cart> order = new HashMap<>();
-        HttpSession session = request.getSession();
-        HashMap<Integer, Cart> cart = (HashMap<Integer, Cart>)session.getAttribute("cart");
-        if(cart==null||cart.isEmpty()||idChecked==null||idChecked.length==0){
-            response.sendRedirect("carts");
-            return;
-        }
-        int totalPrice = 0;
-        ArrayList<String> error = new ArrayList<>();
-        for (String i : idChecked) {
-            Cart temp = cart.get(Integer.valueOf(i));
-            if(temp!=null){
-                ArrayList<Serial_number> sn = new Serial_numberDAO().getAllByProductIdAndStatus(temp.getProduct().getId(),1);
-                if(temp.getQuantity()<=sn.size()){
-                    order.put(temp.getProduct().getId(), temp);
-                    totalPrice += temp.getProduct().getPrice()*temp.getQuantity();
+        try {
+            HttpSession session = request.getSession();
+            HashMap<Integer, Cart> order = new HashMap<>();
+            ArrayList<String> error = new ArrayList<>();
+            int totalPrice = 0;
+            if (request.getParameter("productID") == null) {
+                String[] idChecked = request.getParameterValues("check");
+                HashMap<Integer, Cart> cart = (HashMap<Integer, Cart>) session.getAttribute("cart");
+                if (cart == null || cart.isEmpty() || idChecked == null || idChecked.length == 0) {
+                    response.sendRedirect("carts");
+                    return;
                 }
-                else{
-                    error.add(sn.size()>0?temp.getProduct().getName() + " remaining " + sn.size() + " left!!!":temp.getProduct().getName() + " is out of stock!!!");
+                for (String i : idChecked) {
+                    Cart temp = cart.get(Integer.valueOf(i));
+                    if (temp != null) {
+                        ArrayList<Serial_number> sn = new Serial_numberDAO().getAllByProductIdAndStatus(temp.getProduct().getId(), 1);
+                        if (temp.getQuantity() <= sn.size()) {
+                            order.put(temp.getProduct().getId(), temp);
+                            totalPrice += temp.getProduct().getPrice() * temp.getQuantity();
+                        } else {
+                            error.add(sn.size() > 0 ? temp.getProduct().getName() + " remaining " + sn.size() + " left!!!" : temp.getProduct().getName() + " is out of stock!!!");
+                        }
+                    } else {
+                        error.clear();
+                        error.add("Somethings went wrong!!!");
+                        request.setAttribute("alertMessage", error);
+                        request.setAttribute("alertType", "danger");
+                        request.getRequestDispatcher("carts").forward(request, response);
+                        return;
+                    }
                 }
             }
             else{
-                error.clear();
-                error.add("Somethings went wrong!!!");
+                int id = Integer.parseInt(request.getParameter("productID"));
+                Product temp = new ProductDAO().getById(id);
+                totalPrice = temp.getPrice();
+                order.put(id, new Cart(temp, 1));
+            }
+            if (error.isEmpty()) {
+                request.setAttribute("totalPrice", totalPrice);
+                session.setAttribute("order", order);
+                request.getRequestDispatcher("Views/Customers/Payment.jsp").forward(request, response);
+                return;
+            } else {
                 request.setAttribute("alertMessage", error);
                 request.setAttribute("alertType", "danger");
                 request.getRequestDispatcher("carts").forward(request, response);
                 return;
             }
+        } catch (Exception e) {
+            System.err.println("Checkout exception:" + e.getMessage());
         }
-        if(error.isEmpty()){
-            request.setAttribute("totalPrice", totalPrice);
-            session.setAttribute("order", order);
-            request.getRequestDispatcher("Views/Customers/Payment.jsp").forward(request, response);
-        }
-        else{
-            request.setAttribute("alertMessage", error);
-            request.setAttribute("alertType", "danger");
-            request.getRequestDispatcher("carts").forward(request, response);
-        }
-        
+        response.sendRedirect("home");
     }
 }

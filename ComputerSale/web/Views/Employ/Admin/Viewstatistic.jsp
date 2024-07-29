@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -62,7 +63,7 @@
                                 <i class="fa fa-chart-line fa-3x text-primary"></i>
                                 <div class="ms-3">
                                     <p class="mb-2">Today Sale</p>
-                                    <h6 class="mb-0">$${requestScope.lineData.get(requestScope.lineData.size()-1)}</h6>
+                                    <h6 class="mb-0"><fmt:formatNumber value="${requestScope.lineData.get(requestScope.lineData.size()-1)}" type='number' groupingUsed='true'/> VND</h6>
                                 </div>
                             </div>
                         </div>
@@ -71,7 +72,7 @@
                                 <i class="fa fa-chart-bar fa-3x text-primary"></i>
                                 <div class="ms-3">
                                     <p class="mb-2">Total Sale</p>
-                                    <h6 class="mb-0">$${requestScope.totalSale}</h6>
+                                    <h6 class="mb-0"><fmt:formatNumber value="${requestScope.totalSale}" type='number' groupingUsed='true'/> VND</h6>
                                 </div>
                             </div>
                         </div>
@@ -80,7 +81,7 @@
                                 <i class="fa fa-chart-area fa-3x text-primary"></i>
                                 <div class="ms-3">
                                     <p class="mb-2">Today Product Sold</p>
-                                    <h6 class="mb-0">${requestScope.todaySold}</h6>
+                                    <h6 class="mb-0"><fmt:formatNumber value="${requestScope.todaySold}" type='number' groupingUsed='true'/></h6>
                                 </div>
                             </div>
                         </div>
@@ -89,7 +90,7 @@
                                 <i class="fa fa-chart-pie fa-3x text-primary"></i>
                                 <div class="ms-3">
                                     <p class="mb-2">Total of Product Sold</p>
-                                    <h6 class="mb-0">${requestScope.totalSold}</h6>
+                                    <h6 class="mb-0"><fmt:formatNumber value="${requestScope.totalSold}" type='number' groupingUsed='true'/></h6>
                                 </div>
                             </div>
                         </div>
@@ -137,7 +138,7 @@
                                                     <td>${i.get(0)}</td>
                                                     <td>${i.get(1)}</td>
                                                     <td>${i.get(2)}</td>
-                                                    <td>$${i.get(3)}</td>
+                                                    <td><fmt:formatNumber value="${i.get(3)}" type='number' groupingUsed='true'/> VNĐ</td>
                                                     <td>${i.get(4)!=null?"Paid":"Not Paid"}</td>
                                                 </tr>
                                             </c:forEach>
@@ -153,21 +154,24 @@
                                 <!--Cusomer-->
                                 <div class="col-sm-12 col-xl-6">
                                     <div class="bg-light rounded h-100 p-4">
-                                        <h6 class="mb-4 col-md-12">Testimonial</h6>
+                                        <h6 class="mb-4 col-md-12">Product rate</h6>
                                         <div class="card-deck row row-cols-2">
                                             <!-- Start loop -->
                                             <div class="col">
                                                 <div class="card border-success mb-3">
                                                     <div class="card-body text-center">
                                                         <img src="<%=request.getContextPath()%>/Image/Products/laptops-2048px-5607.png" alt="Product Image" class="rounded-circle mb-3" style="width: 100px; height: 100px;">
-                                                        <h5 class="card-title mb-1" style="margin-bottom: .25rem;">Product Name</h5>
-                                                        <p class="card-text mb-2" style="margin-bottom: .5rem;">This is an amazing product with excellent features.</p>
+                                                        <h5 class="card-title mb-1" style="margin-bottom: .25rem;">${productRateList.get(0).get(0)}</h5>
+                                                        <p class="card-text mb-2" style="margin-bottom: .5rem;">Average: ${productRateList.get(0).get(1)}</p>
                                                         <div class="rating">
-                                                            <span class="fa fa-star checked" style="color: orange;"></span>
-                                                            <span class="fa fa-star checked" style="color: orange;"></span>
-                                                            <span class="fa fa-star checked" style="color: orange;"></span>
-                                                            <span class="fa fa-star" style="color: #ddd;"></span>
-                                                            <span class="fa fa-star" style="color: #ddd;"></span>
+                                                            <c:forEach var="i" begin="1" end="5">
+                                                                <c:if test="${productRateList.get(0).get(1)-i>=0}">
+                                                                    <span class="fa fa-star checked" style="color: orange;"></span>
+                                                                </c:if>
+                                                                <c:if test="${productRateList.get(0).get(1)-i<0}">
+                                                                    <span class="fa fa-star" style="color: #ddd;"></span>
+                                                                </c:if>
+                                                            </c:forEach>
                                                         </div>
                                                     </div>
                                                     <div class="card-footer text-muted text-center" style="color: #6c757d;">
@@ -183,14 +187,17 @@
                                                 <div class="card border-danger mb-3">
                                                     <div class="card-body text-center">
                                                         <img src="<%=request.getContextPath()%>/Image/Products/laptops-2048px-5607.png" alt="Product Image" class="rounded-circle mb-3" style="width: 100px; height: 100px;">
-                                                        <h5 class="card-title mb-1" style="margin-bottom: .25rem;">Product Name</h5>
-                                                        <p class="card-text mb-2" style="margin-bottom: .5rem;">This product has several issues and doesn't meet expectations.</p>
+                                                        <h5 class="card-title mb-1" style="margin-bottom: .25rem;">${productRateList.get(productRateList.size()-1).get(0)}</h5>
+                                                        <p class="card-text mb-2" style="margin-bottom: .5rem;">Average: ${productRateList.get(productRateList.size()-1).get(1)}</p>
                                                         <div class="rating" >
-                                                            <span class="fa fa-star checked" style="color: orange;"></span>
-                                                            <span class="fa fa-star checked" style="color: orange;"></span>
-                                                            <span class="fa fa-star checked" style="color: orange;"></span>
-                                                            <span class="fa fa-star" style="color: #ddd;"></span>
-                                                            <span class="fa fa-star" style="color: #ddd;"></span>
+                                                            <c:forEach var="i" begin="1" end="5">
+                                                                <c:if test="${productRateList.get(productRateList.size()-1).get(1)-i>=0}">
+                                                                    <span class="fa fa-star checked" style="color: orange;"></span>
+                                                                </c:if>
+                                                                <c:if test="${productRateList.get(productRateList.size()-1).get(1)-i<0}">
+                                                                    <span class="fa fa-star" style="color: #ddd;"></span>
+                                                                </c:if>
+                                                            </c:forEach>
                                                         </div>
                                                     </div>
                                                     <div class="card-footer text-muted text-center" style="color: #6c757d;">
@@ -277,7 +284,7 @@
                                                     <td>${i.get(1)}</td>
                                                     <td>${i.get(2)}</td>
                                                     <td>${i.get(3)}</td>
-                                                    <td>${i.get(4)}</td>
+                                                    <td>${i.get(4)>=0.7?"Good":i.get(4)>=0.4?"Medium":"Bad"}</td>
                                                 </tr>
                                             </c:forEach>
                                         </tbody>

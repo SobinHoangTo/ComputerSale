@@ -74,11 +74,9 @@ public class ManageNewsCategory extends HttpServlet {
                     status = new News_categoryDAO().editCategory(categoryName, Integer.parseInt(id_Raw));
                     break;
                 case "active":
-                    System.out.println(action);
                     status = new News_categoryDAO().updateStatus(1, Integer.parseInt(id_Raw));
                     break;
                 case "inactive":
-                    System.out.println(action);
                     status = new News_categoryDAO().updateStatus(0, Integer.parseInt(id_Raw));
                     break;
                 case "delete":
